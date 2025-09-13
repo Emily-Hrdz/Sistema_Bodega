@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Bodega API Full",
-    "_postman_id": "bodega-api-full-1234",
-    "description": "Colección completa de endpoints para el sistema de gestión de bodega",
+    "name": "Bodega API Full CRUD",
+    "_postman_id": "bodega-api-full-crud-1234",
+    "description": "Colección de endpoints CRUD completos para el sistema de gestión de bodega",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -11,10 +11,7 @@
       "item": [
         {
           "name": "GET bodegas",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/bodegas"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/bodegas" }
         },
         {
           "name": "POST bodegas",
@@ -23,9 +20,28 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Central\",\n  \"ubicacion\": \"Zona 1\",\n  \"capacidad\": 500\n}"
+              "raw": "{\n  \"nombre\": \"Bodega Norte\",\n  \"ubicacion\": \"Zona 5\",\n  \"capacidad\": 800\n}"
             },
             "url": "{{base_url}}/api/bodegas"
+          }
+        },
+        {
+          "name": "PUT bodega",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bodega Norte Modificada\",\n  \"ubicacion\": \"Zona 6\",\n  \"capacidad\": 900,\n  \"ocupacion\": 100\n}"
+            },
+            "url": "{{base_url}}/api/bodegas/1"
+          }
+        },
+        {
+          "name": "DELETE bodega",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/bodegas/1"
           }
         }
       ]
@@ -35,10 +51,7 @@
       "item": [
         {
           "name": "GET tipos",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/tipos"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/tipos" }
         },
         {
           "name": "POST tipos",
@@ -47,9 +60,28 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Alimentos\",\n  \"descripcion\": \"Productos comestibles\"\n}"
+              "raw": "{\n  \"nombre\": \"Bebidas\",\n  \"descripcion\": \"Productos líquidos\"\n}"
             },
             "url": "{{base_url}}/api/tipos"
+          }
+        },
+        {
+          "name": "PUT tipo",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bebidas Modificadas\",\n  \"descripcion\": \"Descripción actualizada\"\n}"
+            },
+            "url": "{{base_url}}/api/tipos/1"
+          }
+        },
+        {
+          "name": "DELETE tipo",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/tipos/1"
           }
         }
       ]
@@ -59,10 +91,7 @@
       "item": [
         {
           "name": "GET productos",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/productos"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/productos" }
         },
         {
           "name": "POST productos",
@@ -71,9 +100,28 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigo\": \"P001\",\n  \"nombre\": \"Arroz\",\n  \"tipo\": 1,\n  \"unidad\": \"kg\"\n}"
+              "raw": "{\n  \"codigo\": \"P002\",\n  \"nombre\": \"Aceite\",\n  \"tipo\": 1,\n  \"unidad\": \"lt\"\n}"
             },
             "url": "{{base_url}}/api/productos"
+          }
+        },
+        {
+          "name": "PUT producto",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"P002\",\n  \"nombre\": \"Aceite Modificado\",\n  \"tipo\": 1,\n  \"unidad\": \"litros\"\n}"
+            },
+            "url": "{{base_url}}/api/productos/1"
+          }
+        },
+        {
+          "name": "DELETE producto",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/productos/1"
           }
         }
       ]
@@ -83,10 +131,7 @@
       "item": [
         {
           "name": "GET clientes",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/clientes"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/clientes" }
         },
         {
           "name": "POST clientes",
@@ -95,21 +140,28 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nit\": \"123456-7\",\n  \"razon_social\": \"Cliente Ejemplo\",\n  \"contacto\": \"Juan Perez\",\n  \"telefono\": \"5555-5555\",\n  \"email\": \"cliente@example.com\",\n  \"direccion\": \"Ciudad\"\n}"
+              "raw": "{\n  \"nit\": \"987654-3\",\n  \"razon_social\": \"Cliente Nuevo\",\n  \"contacto\": \"Ana Lopez\",\n  \"telefono\": \"4444-4444\",\n  \"email\": \"ana@example.com\",\n  \"direccion\": \"Zona 2\"\n}"
             },
             "url": "{{base_url}}/api/clientes"
           }
-        }
-      ]
-    },
-    {
-      "name": "Inventario",
-      "item": [
+        },
         {
-          "name": "GET inventario",
+          "name": "PUT cliente",
           "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/inventario"
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nit\": \"987654-3\",\n  \"razon_social\": \"Cliente Modificado\",\n  \"contacto\": \"Ana L.\",\n  \"telefono\": \"3333-3333\",\n  \"email\": \"ana.l@example.com\",\n  \"direccion\": \"Zona 10\"\n}"
+            },
+            "url": "{{base_url}}/api/clientes/1"
+          }
+        },
+        {
+          "name": "DELETE cliente",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/clientes/1"
           }
         }
       ]
@@ -119,10 +171,7 @@
       "item": [
         {
           "name": "GET ingresos",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/ingresos"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/ingresos" }
         },
         {
           "name": "POST ingresos",
@@ -135,6 +184,25 @@
             },
             "url": "{{base_url}}/api/ingresos"
           }
+        },
+        {
+          "name": "PUT ingreso",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 80,\n  \"observaciones\": \"Actualizado\"\n}"
+            },
+            "url": "{{base_url}}/api/ingresos/1"
+          }
+        },
+        {
+          "name": "DELETE ingreso",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/ingresos/1"
+          }
         }
       ]
     },
@@ -143,10 +211,7 @@
       "item": [
         {
           "name": "GET despachos",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/despachos"
-          }
+          "request": { "method": "GET", "url": "{{base_url}}/api/despachos" }
         },
         {
           "name": "POST despachos",
@@ -159,14 +224,30 @@
             },
             "url": "{{base_url}}/api/despachos"
           }
+        },
+        {
+          "name": "PUT despacho (estado)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Enviado\"\n}"
+            },
+            "url": "{{base_url}}/api/despachos/1"
+          }
+        },
+        {
+          "name": "DELETE despacho",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/despachos/1"
+          }
         }
       ]
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:4000"
-    }
+    { "key": "base_url", "value": "http://localhost:4000" }
   ]
 }
