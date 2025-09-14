@@ -245,7 +245,28 @@
           }
         }
       ]
+    },
+{
+  "name": "Inventario",
+  "item": [
+    {
+      "name": "GET inventario (todos)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/inventario"
+      }
+    },
+    {
+      "name": "GET inventario por bodega",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/inventario/1"
+      }
     }
+  ]
+}
+
+
   ],
   "variable": [
     { "key": "base_url", "value": "http://localhost:4000" }
