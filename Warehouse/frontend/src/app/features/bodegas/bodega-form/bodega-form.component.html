@@ -1,0 +1,51 @@
+<div class="container">
+  <h1>{{ isEditMode ? 'Editar Bodega' : 'Nueva Bodega' }}</h1>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="bodegaForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input
+        type="text"
+        id="nombre"
+        formControlName="nombre"
+        class="form-control"
+        [class.is-invalid]="bodegaForm.get('nombre')?.invalid && bodegaForm.get('nombre')?.touched"
+      />
+      <div class="invalid-feedback" *ngIf="bodegaForm.get('nombre')?.invalid && bodegaForm.get('nombre')?.touched">
+        El nombre es requerido (máx. 100 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="ubicacion">Ubicación</label>
+      <input
+        type="text"
+        id="ubicacion"
+        formControlName="ubicacion"
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" formControlName="activo" />
+        Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="bodegaForm.invalid || loading">
+        {{ isEditMode ? 'Actualizar' : 'Crear' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
+
+
+

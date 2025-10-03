@@ -1,0 +1,14 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <h1>{{ title }}</h1>
+  </div>
+  <ul class="navbar-nav">
+    <li><a routerLink="/kardex" routerLinkActive="active">Kardex</a></li>
+    <li><a routerLink="/bodegas" routerLinkActive="active">Bodegas</a></li>
+    <li><a routerLink="/productos" routerLinkActive="active">Productos</a></li>
+  </ul>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,77 @@
+<div class="container">
+  <h1>Nuevo Movimiento Kardex</h1>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="kardexForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="bodegaId">Bodega *</label>
+      <select id="bodegaId" formControlName="bodegaId" class="form-control">
+        <option value="">Seleccione una bodega</option>
+        <option *ngFor="let bodega of bodegas" [value]="bodega.id">
+          {{ bodega.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="productoId">Producto *</label>
+      <select id="productoId" formControlName="productoId" class="form-control">
+        <option value="">Seleccione un producto</option>
+        <option *ngFor="let producto of productos" [value]="producto.id">
+          {{ producto.nombre }} ({{ producto.codigo }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="tipoMovimientoId">Tipo de Movimiento *</label>
+      <select id="tipoMovimientoId" formControlName="tipoMovimientoId" class="form-control">
+        <option value="">Seleccione un tipo</option>
+        <option *ngFor="let tipo of tiposMovimiento" [value]="tipo.id">
+          {{ tipo.nombre }} ({{ tipo.tipo }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad">Cantidad *</label>
+      <input
+        type="number"
+        id="cantidad"
+        formControlName="cantidad"
+        class="form-control"
+        step="0.001"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fecha">Fecha</label>
+      <input
+        type="date"
+        id="fecha"
+        formControlName="fecha"
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="observaciones">Observaciones</label>
+      <textarea
+        id="observaciones"
+        formControlName="observaciones"
+        class="form-control"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="kardexForm.invalid || loading">
+        Crear Movimiento
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

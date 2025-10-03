@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="header">
+    <h1>Bodegas</h1>
+    <button class="btn btn-primary" routerLink="/bodegas/new">
+      Nueva Bodega
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div class="table-container" *ngIf="!loading && !error">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bodega of bodegas">
+          <td>{{ bodega.id }}</td>
+          <td>{{ bodega.nombre }}</td>
+          <td>{{ bodega.ubicacion || '-' }}</td>
+          <td>
+            <span [class]="bodega.activo ? 'badge-success' : 'badge-danger'">
+              {{ bodega.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-info" [routerLink]="['/bodegas', bodega.id]">
+              Ver
+            </button>
+            <button class="btn btn-sm btn-warning" [routerLink]="['/bodegas', bodega.id, 'edit']">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteBodega(bodega.id)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

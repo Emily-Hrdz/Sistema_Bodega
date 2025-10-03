@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bodega {
+  id                Int                @id @default(autoincrement())
+  nombre            String             @unique @db.VarChar(100)
+  ubicacion         String?            @db.VarChar(200)
+  activo            Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  kardex            Kardex[]
+  bodegaDiferencias BodegaDiferencia[]
+
+  @@map("bodegas")
+}
+
+model Producto {
+  id            Int           @id @default(autoincrement())
+  codigo        String        @unique @db.VarChar(50)
+  nombre        String        @db.VarChar(200)
+  descripcion   String?       @db.Text
+  tipoProductoId Int
+  unidadMedida  String        @db.VarChar(20)
+  activo        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  tipoProducto  TipoProducto  @relation(fields: [tipoProductoId], references: [id])
+  kardex        Kardex[]
+
+  @@map("productos")
+}
+
+model TipoProducto {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @unique @db.VarChar(100)
+  descripcion String?    @db.Text
+  activo      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  productos   Producto[]
+
+  @@map("tipos_producto")
+}
+
+model Container {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique @db.VarChar(50)
+  descripcion String?  @db.Text
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  kardex      Kardex[]
+
+  @@map("containers")
+}
+
+model Lote {
+  id               Int      @id @default(autoincrement())
+  codigo           String   @unique @db.VarChar(50)
+  fechaVencimiento DateTime?
+  activo           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  kardex           Kardex[]
+
+  @@map("lotes")
+}
+
+model Cliente {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique @db.VarChar(50)
+  nombre    String   @db.VarChar(200)
+  email     String?  @db.VarChar(100)
+  telefono  String?  @db.VarChar(20)
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  kardex    Kardex[]
+
+  @@map("clientes")
+}
+
+model TipoMovimiento {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique @db.VarChar(20)
+  nombre      String   @db.VarChar(100)
+  descripcion String?  @db.Text
+  tipo        String   @db.VarChar(20) // 'ENTRADA' o 'SALIDA'
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  kardex      Kardex[]
+
+  @@map("tipos_movimiento")
+}
+
+model Kardex {
+  id                Int            @id @default(autoincrement())
+  bodegaId          Int
+  productoId        Int
+  containerId       Int?
+  loteId            Int?
+  clienteId         Int?
+  tipoMovimientoId  Int
+  fecha             DateTime       @default(now())
+  cantidad          Decimal        @db.Decimal(15, 3)
+  saldoAnterior     Decimal        @db.Decimal(15, 3)
+  saldoNuevo        Decimal        @db.Decimal(15, 3)
+  observaciones     String?        @db.Text
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  bodega            Bodega         @relation(fields: [bodegaId], references: [id])
+  producto          Producto       @relation(fields: [productoId], references: [id])
+  container         Container?     @relation(fields: [containerId], references: [id])
+  lote              Lote?          @relation(fields: [loteId], references: [id])
+  cliente           Cliente?       @relation(fields: [clienteId], references: [id])
+  tipoMovimiento    TipoMovimiento @relation(fields: [tipoMovimientoId], references: [id])
+
+  @@index([bodegaId, productoId, fecha])
+  @@map("kardex")
+}
+
+model BodegaDiferencia {
+  id                Int      @id @default(autoincrement())
+  bodegaId          Int
+  productoId        Int
+  cantidadSistema   Decimal  @db.Decimal(15, 3)
+  cantidadFisica    Decimal  @db.Decimal(15, 3)
+  diferencia        Decimal  @db.Decimal(15, 3)
+  fechaConteo       DateTime
+  observaciones     String?  @db.Text
+  ajustado          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  bodega            Bodega   @relation(fields: [bodegaId], references: [id])
+
+  @@map("bodegas_diferencias")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(100)
+  password  String   @db.VarChar(255)
+  nombre    String   @db.VarChar(200)
+  rol       String   @db.VarChar(50) // 'ADMIN', 'OPERADOR', 'SUPERVISOR'
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  accion      String   @db.VarChar(100) // 'CREATE', 'UPDATE', 'DELETE', 'LOGIN', etc.
+  entidad     String   @db.VarChar(100) // 'KARDEX', 'BODEGA', 'PRODUCTO', etc.
+  entidadId   Int?
+  descripcion String   @db.Text
+  ipAddress   String?  @db.VarChar(50)
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([entidad, entidadId])
+  @@map("audit_logs")
+}

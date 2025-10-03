@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="header">
+    <h1>Movimientos Kardex</h1>
+    <button class="btn btn-primary" routerLink="/kardex/new">
+      Nuevo Movimiento
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div class="table-container" *ngIf="!loading && !error">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Bodega</th>
+          <th>Producto</th>
+          <th>Tipo Movimiento</th>
+          <th>Cantidad</th>
+          <th>Saldo Anterior</th>
+          <th>Saldo Nuevo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mov of movimientos">
+          <td>{{ mov.fecha | date:'short' }}</td>
+          <td>{{ mov.bodega?.nombre }}</td>
+          <td>{{ mov.producto?.nombre }}</td>
+          <td>
+            <span [class]="mov.tipoMovimiento?.tipo === 'ENTRADA' ? 'badge-success' : 'badge-warning'">
+              {{ mov.tipoMovimiento?.nombre }}
+            </span>
+          </td>
+          <td>{{ mov.cantidad }}</td>
+          <td>{{ mov.saldoAnterior }}</td>
+          <td>{{ mov.saldoNuevo }}</td>
+          <td>
+            <button class="btn btn-sm btn-info" [routerLink]="['/kardex', mov.id]">
+              Ver
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteMovimiento(mov.id)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

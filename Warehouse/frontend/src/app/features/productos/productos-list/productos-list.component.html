@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="header">
+    <h1>Productos</h1>
+    <button class="btn btn-primary" routerLink="/productos/new">
+      Nuevo Producto
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div class="table-container" *ngIf="!loading && !error">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Unidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td>{{ producto.codigo }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.tipoProducto?.nombre || '-' }}</td>
+          <td>{{ producto.unidadMedida }}</td>
+          <td>
+            <span [class]="producto.activo ? 'badge-success' : 'badge-danger'">
+              {{ producto.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-info" [routerLink]="['/productos', producto.id]">
+              Ver
+            </button>
+            <button class="btn btn-sm btn-warning" [routerLink]="['/productos', producto.id, 'edit']">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteProducto(producto.id)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

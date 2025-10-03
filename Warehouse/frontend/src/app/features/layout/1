@@ -1,0 +1,29 @@
+// main-layout.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-main-layout',
+  templateUrl: './main-layout.component.html',
+  styleUrls: ['./main-layout.component.scss']
+})
+export class MainLayoutComponent {
+  isCollapsed: boolean = false;
+
+  // Define la estructura de tu menú
+  menuItems = [
+    // La propiedad 'icon' usa texto o íconos de fuentes como Material Icons.
+    // Aquí usamos iconos simples de texto para el ejemplo.
+    { label: 'Dashboard', route: '/dashboard', icon: '' }, // Icono de Dashboard
+    { label: 'Crear ticket', route: '/crear-ticket', icon: '+' },
+    { label: 'Solicitar Accesos', route: '/solicitar-accesos', icon: '+' },
+    { label: 'Tickets Creados', route: '/tickets-creados', icon: '' }, // Icono de Avión/Flecha
+    { label: 'Accesos Solicitados', route: '/accesos-solicitados', icon: '' } // Icono de Llave
+  ];
+
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+  }
+
+  // Si estás usando Angular Material o Font Awesome, ajusta los íconos
+}
