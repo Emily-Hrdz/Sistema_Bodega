@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="header">
+    <h1>{{ isEditMode ? 'Editar Tipo de Producto' : 'Nuevo Tipo de Producto' }}</h1>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="tipoProductoForm" (ngSubmit)="onSubmit()" class="form">
+    
+    <!-- Nombre -->
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input 
+        type="text" 
+        id="nombre" 
+        formControlName="nombre" 
+        class="form-control"
+        [class.invalid]="tipoProductoForm.get('nombre')?.invalid && tipoProductoForm.get('nombre')?.touched">
+      <div class="error-message" *ngIf="tipoProductoForm.get('nombre')?.invalid && tipoProductoForm.get('nombre')?.touched">
+        El nombre es requerido (máx. 100 caracteres)
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea 
+        id="descripcion" 
+        formControlName="descripcion" 
+        class="form-control"
+        rows="3"></textarea>
+    </div>
+
+    <!-- Activo -->
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" formControlName="activo">
+        Activo
+      </label>
+    </div>
+
+    <!-- Botones -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="tipoProductoForm.invalid || loading">
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Kardex: Inventario, Movimientos y Diferencias</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    /* Estilos Generales */
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .main-content {
+        width: 1000px; /* Ancho ajustado para centrar sin menú lateral */
+    }
+    .diagram-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        background: #fff;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    /* Estilos para Nodos (Cajas) */
+    .node {
+        position: absolute;
+        width: 180px;
+        height: 100px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+        padding: 10px;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .node i {
+        font-size: 30px;
+        margin-bottom: 3px;
+    }
+    .node p {
+        font-size: 14px;
+        margin: 2px 0;
+        font-weight: bold;
+    }
+    .node .subtitle {
+        font-size: 12px;
+        font-weight: normal;
+        margin-top: 3px;
+    }
+
+    /* Posición y Colores de Nodos */
+    
+    /* Ingresos (Nuevo nodo, Rojo con flecha abajo en la explicación, pero en el diagrama original no está. Lo pondremos alineado con egresos) */
+    #ingresos { 
+        top: 100px; 
+        left: 100px; 
+        background: #e8f5e9; 
+        border: 1px solid #00c853; 
+        color: #00c853; 
+    }
+    #ingresos i { color: #00c853; }
+
+    /* Egresos (En la imagen es rojo, con flecha hacia arriba) */
+    #egresos { 
+        top: 300px; 
+        left: 100px; 
+        background: #ffebee; 
+        border: 1px solid #ef5350; 
+        color: #ef5350; 
+    }
+    #egresos i { color: #ef5350; }
+
+    /* Kardex (En la imagen es amarillo) */
+    #kardex { 
+        top: 200px; 
+        left: 400px; 
+        background: #fffde7; 
+        border: 1px solid #ffeb3b; 
+        color: #333;
+    }
+    #kardex i { color: #ffeb3b; }
+
+    /* Diferencia (En la imagen es naranja/amarillo oscuro, con forma de balanza) */
+    #diferencia { 
+        top: 200px; 
+        left: 750px; 
+        background: #fff3e0; 
+        border: 1px solid #ff9800; 
+        color: #333;
+    }
+    #diferencia i { color: #ff9800; }
+
+    /* Estilos SVG para Líneas de Flujo */
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        z-index: 5;
+    }
+    .flow {
+        fill: none;
+        stroke-width: 3;
+        stroke-dasharray: 8 8; /* Líneas punteadas */
+        animation: dash 1.5s linear infinite; /* Animación */
+        marker-end: url(#arrowhead); /* Flecha al final */
+    }
+    /* Keyframes para la animación de "flujo" */
+    @keyframes dash {
+        to {
+            stroke-dashoffset: 16;
+        }
+    }
+    .flow.ingreso-kardex { stroke: #00c853; } /* Línea verde */
+    .flow.egreso-kardex { stroke: #ef5350; } /* Línea roja */
+    .flow.kardex-diferencia { stroke: #ffeb3b; } /* Línea amarilla */
+
+    .label {
+        font-size: 13px;
+        font-weight: bold;
+        fill: #000;
+        paint-order: stroke;
+        stroke: #fff;
+        stroke-width: 4px;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+    }
+
+    /* Estilos para el Panel de Explicación Inferior */
+    .explanation-card {
+        width: 100%;
+        padding: 20px;
+        background: #e8f5e9;
+        border: 2px solid #a5d6a7;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        margin-top: 20px;
+    }
+    .explanation-card h2 {
+        color: #2e7d32;
+        margin-top: 0;
+        font-size: 18px;
+        border-bottom: 2px solid #c8e6c9;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+    }
+    .explanation-card p {
+        color: #333;
+        line-height: 1.5;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    .flex-container {
+        display: flex;
+        gap: 30px;
+        margin-top: 15px;
+    }
+    .flex-item {
+        flex: 1;
+        min-width: 45%;
+    }
+    .item-title {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    .item-title i {
+        font-size: 20px;
+        margin-right: 8px;
+    }
+
+    /* Colores y flechas en la explicación (simulando los de la imagen) */
+    .entrada-title i { color: #fff; background-color: #00c853; padding: 5px; border-radius: 50%; }
+    .salida-title i { color: #fff; background-color: #ef5350; padding: 5px; border-radius: 50%; }
+
+    .list-container ul {
+        margin: 5px 0 0 25px;
+        padding: 0;
+        list-style-type: disc;
+        font-size: 13px;
+        color: #555;
+    }
+    .list-container li {
+        margin-bottom: 5px;
+    }
+</style>
+</head>
+<body>
+<div class="main-content">
+    <div class="diagram-container">
+        <div class="node" id="ingresos">
+            <i class="fas fa-arrow-down"></i>
+            <p>Ingresos</p>
+            <p class="subtitle">Entradas al Inventario</p>
+        </div>
+        
+        <div class="node" id="egresos">
+            <i class="fas fa-arrow-up"></i>
+            <p>Egresos</p>
+            <p class="subtitle">Salidas del Inventario</p>
+        </div>
+        
+        <div class="node" id="kardex">
+            <i class="fas fa-clipboard-list"></i>
+            <p>Kardex:</p>
+            <p class="subtitle">Registro de movimientos</p>
+        </div>
+        
+        <div class="node" id="diferencia">
+            <i class="fas fa-balance-scale"></i>
+            <p>Diferencia</p>
+            <p class="subtitle">Saldo actual</p>
+        </div>
+
+        <svg>
+            <defs>
+                <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+                    <polygon points="6 2, 0 0, 0 4" fill="#666" />
+                </marker>
+            </defs>
+
+            <path class="flow ingreso-kardex" 
+                  d="M 280 150 C 350 180, 400 210, 480 230" 
+                  marker-end="url(#arrowhead)"></path>
+            <text x="350" y="160" class="label">Registro de Ingresos</text>
+
+            <path class="flow egreso-kardex" 
+                  d="M 280 350 C 350 320, 400 290, 480 270" 
+                  marker-end="url(#arrowhead)"></path>
+            <text x="350" y="320" class="label">Registro de Egresos</text>
+
+            <path class="flow kardex-diferencia" 
+                  d="M 580 250 C 665 250, 715 250, 750 250" 
+                  marker-end="url(#arrowhead)"></path>
+            <text x="660" y="240" class="label">Cálculo de</text>
+            <text x="660" y="265" class="label">Diferencia</text>
+
+        </svg>
+    </div>
+
+    <div class="explanation-card">
+        <h2>Kardex: Entradas, Salidas, Contenedores y Lotes</h2>
+        <p>
+            El <b>Kardex</b> permite registrar y controlar todos los movimientos de inventario, diferenciando claramente las <b>entradas</b> y <b>salidas</b>. Además, gestiona <b>contenedores</b> y <b>lotes</b> para trazabilidad precisa.
+        </p>
+        
+        <div class="flex-container">
+            <div class="flex-item">
+                <div class="item-title entrada-title">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Entradas al Inventario</span>
+                </div>
+                <div class="list-container">
+                    <ul>
+                        <li>Registro de productos que ingresan, indicando **lote** y **contenedor**.</li>
+                        <li>Identificación de procedencia y fecha.</li>
+                        <li>Control de calidad y trazabilidad.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex-item">
+                <div class="item-title salida-title">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Salidas del Inventario</span>
+                </div>
+                <div class="list-container">
+                    <ul>
+                        <li>Registro de productos que egresan, indicando **lote** y **contenedor**.</li>
+                        <li>Control del destino y uso de cada salida.</li>
+                        <li>Evita pérdidas y errores por mala gestión de lotes.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

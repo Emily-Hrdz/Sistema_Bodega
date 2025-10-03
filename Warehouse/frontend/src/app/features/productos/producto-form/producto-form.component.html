@@ -1,0 +1,84 @@
+<div class="container">
+  <div class="header">
+    <h1>{{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}</h1>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" class="form">
+    <div class="form-group">
+      <label for="codigo">Código *</label>
+      <input 
+        type="text" 
+        id="codigo" 
+        formControlName="codigo" 
+        class="form-control"
+        [class.invalid]="productoForm.get('codigo')?.invalid && productoForm.get('codigo')?.touched">
+      <div class="error-message" *ngIf="productoForm.get('codigo')?.invalid && productoForm.get('codigo')?.touched">
+        El código es requerido (máx. 50 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input 
+        type="text" 
+        id="nombre" 
+        formControlName="nombre" 
+        class="form-control"
+        [class.invalid]="productoForm.get('nombre')?.invalid && productoForm.get('nombre')?.touched">
+      <div class="error-message" *ngIf="productoForm.get('nombre')?.invalid && productoForm.get('nombre')?.touched">
+        El nombre es requerido (máx. 200 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea 
+        id="descripcion" 
+        formControlName="descripcion" 
+        class="form-control"
+        rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="tipoProductoId">Tipo de Producto *</label>
+      <select 
+        id="tipoProductoId" 
+        formControlName="tipoProductoId" 
+        class="form-control"
+        [class.invalid]="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
+        <option value="">Seleccione un tipo</option>
+        <option *ngFor="let tipo of tiposProducto" [value]="tipo.id">
+          {{ tipo.nombre }}
+        </option>
+      </select>
+      <div class="error-message" *ngIf="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
+        El tipo de producto es requerido
+      </div>
+    </div>
+
+    <div class="form-row">
+      
+
+      <div class="form-group">
+        <label for="unidadMedida">Unidad de Medida</label>
+        <input 
+          type="text" 
+          id="unidadMedida" 
+          formControlName="unidadMedida" 
+          class="form-control"
+          placeholder="ej: kg, unidad, litro">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid || loading">
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</div>

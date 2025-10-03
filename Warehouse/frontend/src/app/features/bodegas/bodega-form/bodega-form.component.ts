@@ -69,7 +69,7 @@ export class BodegaFormComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.router.navigate(['/bodegas']);
+        this.router.navigate(['/bodegas/list']);
       },
       error: (err) => {
         this.error = 'Error al guardar bodega';
@@ -80,6 +80,6 @@ export class BodegaFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/bodegas']);
+    this.router.navigate(['/bodegas/list']);
   }
 }

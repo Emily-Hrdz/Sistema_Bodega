@@ -1,8 +1,13 @@
 <div class="container">
   <div class="header">
     <h1>Productos</h1>
-    <button class="btn btn-primary" routerLink="/productos/new">
+     <button class="btn btn-sm btn-primary" [routerLink]="['/productos', 'nuevo']">
       Nuevo Producto
+    </button>
+    <p>Administra los tipos de producto de tu inventario.</p>
+    <h2>Tipos de Producto </h2>
+    <button class="btn btn-sm btn-primary" routerLink="/tipos-producto">
+      Crear Tipo de Producto
     </button>
   </div>
 

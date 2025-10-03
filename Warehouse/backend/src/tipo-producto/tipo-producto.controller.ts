@@ -12,7 +12,7 @@ import { TipoProductoService } from './tipo-producto.service';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
 
-@Controller('api/tipos-producto')
+@Controller('api/tipos-productos')
 export class TipoProductoController {
   constructor(private readonly tipoProductoService: TipoProductoService) {}
 
