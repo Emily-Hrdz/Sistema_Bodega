@@ -33,8 +33,8 @@ export class ClienteService {
   }
 
   update(id: number, cliente: Partial<Cliente>): Observable<Cliente> {
-  return this.http.patch<Cliente>(`${this.apiUrl}/${id}`, cliente);
- }
+    return this.http.patch<Cliente>(`${this.apiUrl}/${id}`, cliente);
+  }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

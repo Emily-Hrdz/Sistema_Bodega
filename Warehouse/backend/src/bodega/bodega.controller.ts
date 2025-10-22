@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards, 
 } from '@nestjs/common';
 import { BodegaService } from './bodega.service';
 import { CreateBodegaDto } from './dto/create-bodega.dto';
 import { UpdateBodegaDto } from './dto/update-bodega.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/bodegas')
+@UseGuards(JwtAuthGuard) 
 export class BodegaController {
   constructor(private readonly bodegaService: BodegaService) {}
 

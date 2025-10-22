@@ -22,15 +22,34 @@ export class AuditLogsListComponent implements OnInit {
 
   loadAuditLogs(): void {
     this.loading = true;
-    this.auditLogService.getAll(100).subscribe({ // CORREGIDO: agregado parámetro limit
+    this.error = null;
+    
+    this.auditLogService.getAll(100).subscribe({
+      next: (data) => {
+        this.auditLogs = data;
+        this.loading = false;
+        console.log('Auditoría cargada:', data); // Para debug
+      },
+      error: (err) => {
+        console.error('Error detallado:', err);
+        this.error = `Error al cargar auditoría: ${err.status} ${err.statusText}`;
+        this.loading = false;
+        
+        // Intenta cargar sin parámetros
+        this.loadAuditLogsSimple();
+      }
+    });
+  }
+
+  loadAuditLogsSimple(): void {
+    this.auditLogService.getAllSimple().subscribe({
       next: (data) => {
         this.auditLogs = data;
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al cargar auditoría';
+        this.error = 'No se pudo cargar la auditoría. Verifica que el endpoint exista.';
         this.loading = false;
-        console.error(err);
       }
     });
   }

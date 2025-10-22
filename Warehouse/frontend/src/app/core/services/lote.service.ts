@@ -31,8 +31,8 @@ export class LoteService {
   }
 
   update(id: number, lote: Partial<Lote>): Observable<Lote> {
-  return this.http.patch<Lote>(`${this.apiUrl}/${id}`, lote);
- }
+    return this.http.patch<Lote>(`${this.apiUrl}/${id}`, lote);
+  }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

@@ -30,10 +30,10 @@ export class ContainerService {
     return this.http.post<Container>(this.apiUrl, container);
   }
 
-   update(id: number, container: Partial<Container>): Observable<Container> {
+  update(id: number, container: Partial<Container>): Observable<Container> {
     return this.http.patch<Container>(`${this.apiUrl}/${id}`, container);
   }
-  
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

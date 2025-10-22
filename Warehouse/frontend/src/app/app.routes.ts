@@ -1,4 +1,3 @@
-// app.routes.ts (actualizado)
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -19,7 +18,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/layout/sidebar/sidebar.component').then(m => m.SidebarComponent),
     children: [
-
       // Dashboard
       {
         path: 'dashboard',
@@ -80,23 +78,22 @@ export const routes: Routes = [
 
       // Kardex
       {
-       path: 'kardex/nuevo',
-       loadComponent: () =>
-         import('./features/kardex/kardex-form/kardex-form.component').then(m => m.KardexFormComponent)
+        path: 'kardex/nuevo',
+        loadComponent: () =>
+          import('./features/kardex/kardex-form/kardex-form.component').then(m => m.KardexFormComponent)
       },
       {
-       path: 'kardex/list',
-       loadComponent: () =>
-         import('./features/kardex/kardex-list/kardex-list.component').then(m => m.KardexListComponent)
-     },
+        path: 'kardex/list',
+        loadComponent: () =>
+          import('./features/kardex/kardex-list/kardex-list.component').then(m => m.KardexListComponent)
+      },
       {
-       path: 'kardex',
-       redirectTo: 'kardex/list',
-       pathMatch: 'full'
+        path: 'kardex',
+        redirectTo: 'kardex/list',
+        pathMatch: 'full'
       },
 
-
-      // Containers - NUEVO
+      // Containers
       {
         path: 'containers/nuevo',
         loadComponent: () =>
@@ -113,7 +110,7 @@ export const routes: Routes = [
           import('./features/containers/containers-list/containers-list.component').then(m => m.ContainersListComponent)
       },
 
-      // Lotes - NUEVO
+      // Lotes
       {
         path: 'lotes/nuevo',
         loadComponent: () =>
@@ -130,7 +127,7 @@ export const routes: Routes = [
           import('./features/lotes/lotes-list/lotes-list.component').then(m => m.LotesListComponent)
       },
 
-      // Clientes - NUEVO
+      // Clientes
       {
         path: 'clientes/nuevo',
         loadComponent: () =>
@@ -147,7 +144,7 @@ export const routes: Routes = [
           import('./features/clientes/clientes-list/clientes-list.component').then(m => m.ClientesListComponent)
       },
 
-      // Auditoría - NUEVO
+      // Auditoría
       {
         path: 'audit-logs',
         loadComponent: () =>
@@ -165,6 +162,6 @@ export const routes: Routes = [
   // Redirección para rutas no existentes
   {
     path: '**',
-    redirectTo: 'kardex'
+    redirectTo: 'dashboard'
   }
 ];

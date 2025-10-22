@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards, 
 } from '@nestjs/common';
 import { TipoMovimientoService } from './tipo-movimiento.service';
 import { CreateTipoMovimientoDto } from './dto/create-tipo-movimiento.dto';
 import { UpdateTipoMovimientoDto } from './dto/update-tipo-movimiento.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/tipos-movimiento')
+@UseGuards(JwtAuthGuard)
 export class TipoMovimientoController {
   constructor(private readonly tipoMovimientoService: TipoMovimientoService) {}
 

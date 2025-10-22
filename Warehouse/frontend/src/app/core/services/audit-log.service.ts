@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface AuditLog {
@@ -29,20 +30,19 @@ export class AuditLogService {
 
   constructor(private http: HttpClient) {}
 
-  // CORREGIDO - El endpoint correcto según tu backend
   getAll(limit: number = 100): Observable<AuditLog[]> {
     return this.http.get<AuditLog[]>(this.apiUrl, {
       params: { limit: limit.toString() }
-    });
+    }).pipe(
+      catchError(error => {
+        console.error('Error cargando auditoría:', error);
+       
+        return this.http.get<AuditLog[]>(this.apiUrl);
+      })
+    );
   }
 
-  getByUser(userId: number, limit: number = 50): Observable<AuditLog[]> {
-    return this.http.get<AuditLog[]>(`${this.apiUrl}/user/${userId}`, {
-      params: { limit: limit.toString() }
-    });
-  }
-
-  getByEntity(entidad: string, entidadId: number): Observable<AuditLog[]> {
-    return this.http.get<AuditLog[]>(`${this.apiUrl}/entity/${entidad}/${entidadId}`);
+  getAllSimple(): Observable<AuditLog[]> {
+    return this.http.get<AuditLog[]>(this.apiUrl);
   }
 }

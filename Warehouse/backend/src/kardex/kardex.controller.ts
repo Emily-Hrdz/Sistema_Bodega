@@ -8,12 +8,15 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards, 
 } from '@nestjs/common';
 import { KardexService } from './kardex.service';
 import { CreateKardexDto } from './dto/create-kardex.dto';
 import { UpdateKardexDto } from './dto/update-kardex.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/kardex')
+@UseGuards(JwtAuthGuard)
 export class KardexController {
   constructor(private readonly kardexService: KardexService) {}
 

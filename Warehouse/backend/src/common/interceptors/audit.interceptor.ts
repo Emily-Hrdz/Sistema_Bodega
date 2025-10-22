@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { AuditLogService } from './../../audit-log/audit-log.service';
+import { AuditLogService } from '../../audit-log/audit-log.service';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -14,17 +14,19 @@ export class AuditInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const { method, url, user, ip, headers } = request;
+    const { method, url, user, ip, headers, params, body } = request;
     const userAgent = headers['user-agent'];
 
     // Solo auditar si hay usuario autenticado
-    if (!user) {
+    if (!user || !user.id) {
       return next.handle();
     }
 
-    const accionMap = {
+    const userId = user.id;
+
+    const accionMap: any = {
       POST: 'CREATE',
-      PATCH: 'UPDATE',
+      PATCH: 'UPDATE', 
       PUT: 'UPDATE',
       DELETE: 'DELETE',
       GET: 'READ',
@@ -33,28 +35,94 @@ export class AuditInterceptor implements NestInterceptor {
     const accion = accionMap[method] || method;
     const entidad = this.extractEntityFromUrl(url);
 
+    // Ignorar rutas específicas
+    if (this.shouldIgnoreUrl(url)) {
+      return next.handle();
+    }
+
+    // Obtener entidadId de forma segura
+    let entidadId: number | undefined = undefined;
+    if (params && params.id) {
+      entidadId = parseInt(params.id, 10);
+    } else if (body && body.id) {
+      entidadId = parseInt(body.id, 10);
+    }
+    
     return next.handle().pipe(
       tap((data) => {
-        // Registrar en auditoría después de la operación exitosa
-        this.auditLogService.create({
-          userId: user.userId,
-          accion,
-          entidad,
-          entidadId: data?.id || null,
-          descripcion: `${accion} en ${entidad}: ${url}`,
-          ipAddress: ip,
-          userAgent,
-        }).catch(err => console.error('Error al registrar auditoría:', err));
+        // VERIFICACIÓN EXTRA SEGURA para data
+        if (data === undefined || data === null) {
+          this.createAuditLog(userId, accion, entidad, entidadId, ip, userAgent);
+          return;
+        }
+
+        // Si data es un array (como en GET /api/clientes), no tiene id individual
+        if (Array.isArray(data)) {
+          this.createAuditLog(userId, accion, entidad, undefined, ip, userAgent);
+          return;
+        }
+
+        // Si data es un objeto, intentar obtener el id
+        const dataId = (data as any)?.id;
+        const finalEntidadId = dataId ? parseInt(dataId, 10) : entidadId;
+        
+        this.createAuditLog(userId, accion, entidad, finalEntidadId, ip, userAgent);
       }),
     );
   }
 
-  private extractEntityFromUrl(url: string): string {
-    const parts = url.split('/');
-    const apiIndex = parts.indexOf('api');
-    if (apiIndex !== -1 && parts.length > apiIndex + 1) {
-      return parts[apiIndex + 1].toUpperCase();
+  private createAuditLog(
+    userId: number, 
+    accion: string, 
+    entidad: string, 
+    entidadId: number | undefined, // CAMBIADO: undefined en lugar de null
+    ip: string, 
+    userAgent: string
+  ): void {
+    try {
+      this.auditLogService.create({
+        userId,
+        accion,
+        entidad,
+        entidadId, // Ahora es undefined en lugar de null
+        descripcion: `${accion} en ${entidad}${entidadId ? ` #${entidadId}` : ''}`,
+        ipAddress: ip,
+        userAgent,
+      }).catch(() => {
+        // Silenciar errores de auditoría
+      });
+    } catch (error) {
+      // Silenciar cualquier error
     }
-    return 'UNKNOWN';
+  }
+
+  private extractEntityFromUrl(url: string): string {
+    try {
+      const cleanUrl = url.split('?')[0];
+      const parts = cleanUrl.split('/').filter(part => part);
+      
+      const apiIndex = parts.indexOf('api');
+      if (apiIndex !== -1 && parts.length > apiIndex + 1) {
+        const entity = parts[apiIndex + 1].toUpperCase().replace(/-/g, '_');
+        return entity;
+      }
+      return 'UNKNOWN';
+    } catch {
+      return 'UNKNOWN';
+    }
+  }
+
+  private shouldIgnoreUrl(url: string): boolean {
+    try {
+      const ignoredPatterns = [
+        '/auth/',
+        '/audit-logs',
+        '/health',
+        '/metrics'
+      ];
+      return ignoredPatterns.some(pattern => url.includes(pattern));
+    } catch {
+      return false;
+    }
   }
 }
