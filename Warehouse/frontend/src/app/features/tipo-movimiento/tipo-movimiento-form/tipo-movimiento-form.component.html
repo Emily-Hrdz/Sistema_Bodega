@@ -1,0 +1,81 @@
+<div class="container">
+  <h1>{{ isEdit ? 'Editar' : 'Nuevo' }} Tipo de Movimiento</h1>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="tipoMovimientoForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="codigo">Código *</label>
+      <input
+        type="text"
+        id="codigo"
+        formControlName="codigo"
+        class="form-control"
+        maxlength="20"
+        placeholder="Ej: COMPRA, VENTA, AJUSTE"
+      />
+      <div *ngIf="tipoMovimientoForm.get('codigo')?.invalid && tipoMovimientoForm.get('codigo')?.touched" 
+           class="error">
+        Código es requerido (máx. 20 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input
+        type="text"
+        id="nombre"
+        formControlName="nombre"
+        class="form-control"
+        maxlength="100"
+        placeholder="Ej: Compra de Productos"
+      />
+      <div *ngIf="tipoMovimientoForm.get('nombre')?.invalid && tipoMovimientoForm.get('nombre')?.touched" 
+           class="error">
+        Nombre es requerido
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="tipo">Tipo *</label>
+      <select id="tipo" formControlName="tipo" class="form-control">
+        <option value="">Seleccione un tipo</option>
+        <option *ngFor="let tipo of tipos" [value]="tipo.value">
+          {{ tipo.label }}
+        </option>
+      </select>
+      <div *ngIf="tipoMovimientoForm.get('tipo')?.invalid && tipoMovimientoForm.get('tipo')?.touched" 
+           class="error">
+        Tipo es requerido
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea
+        id="descripcion"
+        formControlName="descripcion"
+        class="form-control"
+        rows="3"
+        placeholder="Descripción del tipo de movimiento"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="activo" />
+        Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" 
+              [disabled]="tipoMovimientoForm.invalid || loading">
+        {{ isEdit ? 'Actualizar' : 'Crear' }} Tipo de Movimiento
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

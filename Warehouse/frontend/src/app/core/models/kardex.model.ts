@@ -27,13 +27,13 @@ export interface Kardex {
 export interface CreateKardexDto {
   bodegaId: number;
   productoId: number;
+  tipoMovimientoId: number;
+  cantidad: number;
+  fecha: Date;
+  observaciones?: string;
   containerId?: number;
   loteId?: number;
   clienteId?: number;
-  tipoMovimientoId: number;
-  fecha?: string;
-  cantidad: number;
-  observaciones?: string;
 }
 
 export interface TipoMovimiento {

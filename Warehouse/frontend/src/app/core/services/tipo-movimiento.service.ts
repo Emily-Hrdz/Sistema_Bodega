@@ -16,7 +16,7 @@ export interface TipoMovimiento {
   providedIn: 'root'
 })
 export class TipoMovimientoService {
-  private apiUrl = `${environment.apiUrl}/tipo-movimiento`;
+  private apiUrl = `${environment.apiUrl}/tipos-movimiento`;
 
   constructor(private http: HttpClient) {}
 

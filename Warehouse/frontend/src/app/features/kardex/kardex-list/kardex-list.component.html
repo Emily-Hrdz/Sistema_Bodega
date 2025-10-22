@@ -1,8 +1,12 @@
 <div class="container">
   <div class="header">
     <h1>Movimientos Kardex</h1>
-    <button class="btn btn-primary" routerLink="/kardex/nuevo"> 
+    <button class="btn btn-sm btn-primary" routerLink="/kardex/nuevo">
       Nuevo Movimiento
+    </button>
+    <h2>Tipos de Movimiento</h2>
+    <button class="btn btn-sm btn-primary" routerLink="/tipos-movimiento/nuevo">
+      Crear Tipo de Movimiento
     </button>
   </div>
 
@@ -29,7 +33,7 @@
           <td>{{ mov.bodega?.nombre }}</td>
           <td>{{ mov.producto?.nombre }}</td>
           <td>
-            <span [class]="mov.tipoMovimiento?.tipo === 'ENTRADA' ? 'badge-success' : 'badge-warning'">
+            <span [class]="mov.tipoMovimiento?.tipo === 'ENTRADA' ? 'badge-success' : 'badge-danger'">
               {{ mov.tipoMovimiento?.nombre }}
             </span>
           </td>

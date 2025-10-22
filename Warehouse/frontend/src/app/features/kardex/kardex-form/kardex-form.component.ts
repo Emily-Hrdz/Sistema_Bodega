@@ -1,8 +1,7 @@
-// features/kardex/kardex-form/kardex-form.component.ts - CORREGIDO
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { KardexService } from '../../../core/services/kardex.service';
 import { BodegaService } from '../../../core/services/bodega.service';
 import { ProductoService } from '../../../core/services/producto.service';
@@ -10,6 +9,7 @@ import { TipoMovimientoService } from '../../../core/services/tipo-movimiento.se
 import { Bodega } from '../../../core/models/bodega.model';
 import { Producto } from '../../../core/models/producto.model';
 import { TipoMovimiento } from '../../../core/services/tipo-movimiento.service';
+import { CreateKardexDto } from '../../../core/models/kardex.model';
 
 @Component({
   selector: 'app-kardex-form',
@@ -25,6 +25,7 @@ export class KardexFormComponent implements OnInit {
   tiposMovimiento: TipoMovimiento[] = [];
   loading = false;
   error: string | null = null;
+  isEdit = false; 
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +33,7 @@ export class KardexFormComponent implements OnInit {
     private bodegaService: BodegaService,
     private productoService: ProductoService,
     private tipoMovimientoService: TipoMovimientoService,
+    private route: ActivatedRoute, 
     private router: Router
   ) {
     this.kardexForm = this.fb.group({
@@ -45,7 +47,36 @@ export class KardexFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCatalogos();
+    
+    const id = this.route.snapshot.params['id'];
+    if (id) {
+      this.isEdit = true;
+      this.loadKardex(Number(id));
+    } else {
+      this.loadCatalogos();
+    }
+  }
+
+  loadKardex(id: number): void {
+    this.loading = true;
+    this.kardexService.getById(id).subscribe({
+      next: (kardex) => {
+        this.kardexForm.patchValue({
+          bodegaId: kardex.bodegaId,
+          productoId: kardex.productoId,
+          tipoMovimientoId: kardex.tipoMovimientoId,
+          cantidad: kardex.cantidad,
+          fecha: new Date(kardex.fecha).toISOString().split('T')[0],
+          observaciones: kardex.observaciones
+        });
+        this.loadCatalogos();
+      },
+      error: (err) => {
+        this.error = 'Error al cargar movimiento';
+        this.loading = false;
+        console.error(err);
+      }
+    });
   }
 
   loadCatalogos(): void {
@@ -65,9 +96,14 @@ export class KardexFormComponent implements OnInit {
       next: (data) => {
         this.tiposMovimiento = data;
         this.loading = false;
+        
+        if (data.length === 0) {
+          this.error = 'No hay tipos de movimiento configurados. Crea algunos primero.';
+        }
       },
       error: (err) => {
         console.error('Error loading tipos movimiento:', err);
+        this.error = 'Error al cargar tipos de movimiento. Verifica la conexión.';
         this.loading = false;
       }
     });
@@ -79,18 +115,40 @@ export class KardexFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const kardexData = this.kardexForm.value;
+    
+    const kardexData: CreateKardexDto = {
+      bodegaId: Number(this.kardexForm.value.bodegaId),
+      productoId: Number(this.kardexForm.value.productoId),
+      tipoMovimientoId: Number(this.kardexForm.value.tipoMovimientoId),
+      cantidad: Number(this.kardexForm.value.cantidad),
+      fecha: this.kardexForm.value.fecha,
+      observaciones: this.kardexForm.value.observaciones
+    };
 
-    this.kardexService.create(kardexData).subscribe({
-      next: () => {
-        this.router.navigate(['/kardex/list']);
-      },
-      error: (err) => {
-        this.error = err.error?.message || 'Error al crear movimiento';
-        this.loading = false;
-        console.error(err);
-      }
-    });
+    if (this.isEdit) {
+      const id = this.route.snapshot.params['id'];
+      this.kardexService.update(Number(id), kardexData).subscribe({
+        next: () => {
+          this.router.navigate(['/kardex/list']);
+        },
+        error: (err) => {
+          this.error = err.error?.message || 'Error al actualizar movimiento';
+          this.loading = false;
+          console.error(err);
+        }
+      });
+    } else {
+      this.kardexService.create(kardexData).subscribe({
+        next: () => {
+          this.router.navigate(['/kardex/list']);
+        },
+        error: (err) => {
+          this.error = err.error?.message || 'Error al crear movimiento';
+          this.loading = false;
+          console.error(err);
+        }
+      });
+    }
   }
 
   onCancel(): void {

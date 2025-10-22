@@ -50,19 +50,17 @@ export class AuditInterceptor implements NestInterceptor {
     
     return next.handle().pipe(
       tap((data) => {
-        // VERIFICACIÓN EXTRA SEGURA para data
+      
         if (data === undefined || data === null) {
           this.createAuditLog(userId, accion, entidad, entidadId, ip, userAgent);
           return;
         }
 
-        // Si data es un array (como en GET /api/clientes), no tiene id individual
         if (Array.isArray(data)) {
           this.createAuditLog(userId, accion, entidad, undefined, ip, userAgent);
           return;
         }
 
-        // Si data es un objeto, intentar obtener el id
         const dataId = (data as any)?.id;
         const finalEntidadId = dataId ? parseInt(dataId, 10) : entidadId;
         
@@ -75,7 +73,7 @@ export class AuditInterceptor implements NestInterceptor {
     userId: number, 
     accion: string, 
     entidad: string, 
-    entidadId: number | undefined, // CAMBIADO: undefined en lugar de null
+    entidadId: number | undefined, 
     ip: string, 
     userAgent: string
   ): void {
@@ -84,15 +82,15 @@ export class AuditInterceptor implements NestInterceptor {
         userId,
         accion,
         entidad,
-        entidadId, // Ahora es undefined en lugar de null
+        entidadId,
         descripcion: `${accion} en ${entidad}${entidadId ? ` #${entidadId}` : ''}`,
         ipAddress: ip,
         userAgent,
       }).catch(() => {
-        // Silenciar errores de auditoría
+       
       });
     } catch (error) {
-      // Silenciar cualquier error
+      
     }
   }
 

@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="header">
+    <h1>Tipos de Movimiento</h1>
+    <button class="btn btn-primary" (click)="onCreate()">
+      Nuevo Tipo de Movimiento
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="!loading && tiposMovimiento.length === 0" class="empty-state">
+    No hay tipos de movimiento registrados
+  </div>
+
+  <table *ngIf="!loading && tiposMovimiento.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tipo of tiposMovimiento">
+        <td>{{ tipo.codigo }}</td>
+        <td>{{ tipo.nombre }}</td>
+        <td>
+          <span [class]="getTipoClass(tipo.tipo)">
+            {{ tipo.tipo }}
+          </span>
+        </td>
+        <td>{{ tipo.descripcion || '-' }}</td>
+        <td>
+          <span [class]="tipo.activo ? 'badge-success' : 'badge-danger'">
+            {{ tipo.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button class="btn btn-sm btn-warning" (click)="onEdit(tipo.id)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="onDelete(tipo.id)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

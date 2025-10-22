@@ -93,6 +93,25 @@ export const routes: Routes = [
         pathMatch: 'full'
       },
 
+
+      // Tipos de Movimiento
+
+     {
+       path: 'tipos-movimiento/nuevo',
+       loadComponent: () =>
+         import('./features/tipo-movimiento/tipo-movimiento-form/tipo-movimiento-form.component').then(m => m.TipoMovimientoFormComponent)
+     },
+     {
+       path: 'tipos-movimiento/:id/edit',
+       loadComponent: () =>
+         import('./features/tipo-movimiento/tipo-movimiento-form/tipo-movimiento-form.component').then(m => m.TipoMovimientoFormComponent)
+    },
+    {
+       path: 'tipos-movimiento',
+       loadComponent: () =>
+         import('./features/tipo-movimiento/tipo-movimiento-list/tipo-movimiento-list.component').then(m => m.TipoMovimientoListComponent)
+    },
+
       // Containers
       {
         path: 'containers/nuevo',
