@@ -1,3 +1,4 @@
+// features/kardex/kardex-form/kardex-form.component.ts - CORREGIDO
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -5,9 +6,10 @@ import { Router } from '@angular/router';
 import { KardexService } from '../../../core/services/kardex.service';
 import { BodegaService } from '../../../core/services/bodega.service';
 import { ProductoService } from '../../../core/services/producto.service';
+import { TipoMovimientoService } from '../../../core/services/tipo-movimiento.service'; 
 import { Bodega } from '../../../core/models/bodega.model';
 import { Producto } from '../../../core/models/producto.model';
-import { TipoMovimiento } from '../../../core/models/kardex.model';
+import { TipoMovimiento } from '../../../core/services/tipo-movimiento.service'; 
 
 @Component({
   selector: 'app-kardex-form',
@@ -29,6 +31,7 @@ export class KardexFormComponent implements OnInit {
     private kardexService: KardexService,
     private bodegaService: BodegaService,
     private productoService: ProductoService,
+    private tipoMovimientoService: TipoMovimientoService, // NUEVO
     private router: Router
   ) {
     this.kardexForm = this.fb.group({
@@ -48,7 +51,8 @@ export class KardexFormComponent implements OnInit {
   loadCatalogos(): void {
     this.bodegaService.getAll().subscribe(data => this.bodegas = data);
     this.productoService.getAll().subscribe(data => this.productos = data);
-    // Cargar tipos de movimiento desde el servicio correspondiente
+    // CORREGIDO: Cargar tipos de movimiento
+    this.tipoMovimientoService.getAll().subscribe(data => this.tiposMovimiento = data);
   }
 
   onSubmit(): void {
@@ -61,7 +65,7 @@ export class KardexFormComponent implements OnInit {
 
     this.kardexService.create(kardexData).subscribe({
       next: () => {
-        this.router.navigate(['/kardex']);
+        this.router.navigate(['/kardex/list']); // Cambiado a /kardex/list
       },
       error: (err) => {
         this.error = err.error?.message || 'Error al crear movimiento';
@@ -72,6 +76,6 @@ export class KardexFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/kardex']);
+    this.router.navigate(['/kardex/list']); // Cambiado a /kardex/list
   }
 }

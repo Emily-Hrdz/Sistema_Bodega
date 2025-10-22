@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="header">
+    <h1>Auditoría del Sistema</h1>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="!loading && auditLogs.length === 0" class="empty-state">
+    No hay registros de auditoría
+  </div>
+
+  <table *ngIf="!loading && auditLogs.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Fecha/Hora</th>
+        <th>Usuario</th>
+        <th>Acción</th>
+        <th>Entidad</th>
+        <th>Descripción</th>
+        <th>IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of auditLogs">
+        <td>{{ formatDate(log.createdAt) }}</td>
+        <td>{{ log.user.nombre }} ({{ log.user.email }})</td>
+        <td>
+          <span [class]="getActionClass(log.accion)">
+            {{ log.accion }}
+          </span>
+        </td>
+        <td>{{ log.entidad }} {{ log.entidadId ? '#' + log.entidadId : '' }}</td>
+        <td>{{ log.descripcion }}</td>
+        <td>{{ log.ipAddress || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

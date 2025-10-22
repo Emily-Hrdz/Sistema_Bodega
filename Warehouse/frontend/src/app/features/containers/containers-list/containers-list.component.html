@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="header">
+    <h1>Containers</h1>
+    <button class="btn btn-primary" (click)="onCreate()">
+      Nuevo Container
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="!loading && containers.length === 0" class="empty-state">
+    No hay containers registrados
+  </div>
+
+  <table *ngIf="!loading && containers.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let container of containers">
+        <td>{{ container.codigo }}</td>
+        <td>{{ container.descripcion || '-' }}</td>
+        <td>
+          <span [class]="container.activo ? 'badge-success' : 'badge-danger'">
+            {{ container.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button class="btn btn-sm btn-info" (click)="onView(container.id)">
+            Ver
+          </button>
+          <button class="btn btn-sm btn-warning" (click)="onEdit(container.id)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="onDelete(container.id)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

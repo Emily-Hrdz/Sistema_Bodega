@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="header">
+    <h1>Lotes</h1>
+    <button class="btn btn-primary" (click)="onCreate()">
+      Nuevo Lote
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="!loading && lotes.length === 0" class="empty-state">
+    No hay lotes registrados
+  </div>
+
+  <table *ngIf="!loading && lotes.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Fecha Vencimiento</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let lote of lotes">
+        <td>{{ lote.codigo }}</td>
+        <td>{{ formatDate(lote.fechaVencimiento) }}</td>
+        <td>
+          <span [class]="lote.activo ? 'badge-success' : 'badge-danger'">
+            {{ lote.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button class="btn btn-sm btn-info" (click)="onView(lote.id)">
+            Ver
+          </button>
+          <button class="btn btn-sm btn-warning" (click)="onEdit(lote.id)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="onDelete(lote.id)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

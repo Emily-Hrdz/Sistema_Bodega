@@ -1,0 +1,49 @@
+<div class="container">
+  <h1>{{ isEdit ? 'Editar' : 'Nuevo' }} Container</h1>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <form [formGroup]="containerForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="codigo">Código *</label>
+      <input
+        type="text"
+        id="codigo"
+        formControlName="codigo"
+        class="form-control"
+        maxlength="50"
+      />
+      <div *ngIf="containerForm.get('codigo')?.invalid && containerForm.get('codigo')?.touched" 
+           class="error">
+        Código es requerido
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea
+        id="descripcion"
+        formControlName="descripcion"
+        class="form-control"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="activo" />
+        Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" 
+              [disabled]="containerForm.invalid || loading">
+        {{ isEdit ? 'Actualizar' : 'Crear' }} Container
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
