@@ -15,16 +15,16 @@ export class SidebarComponent implements OnInit {
   currentUser: User | null = null;
   isCollapsed = false;
 
- menuItems = [
-  { icon: '📊', label: 'Dashboard', route: '/dashboard' },
-  { icon: '🏢', label: 'Bodegas', route: '/bodegas/list' },
-  { icon: '📦', label: 'Productos', route: '/productos/list' },
-  { icon: '📋', label: 'Kardex', route: '/kardex/list' },
-  { icon: '📦', label: 'Containers', route: '/containers' },
-  { icon: '🏷️', label: 'Lotes', route: '/lotes' },
-  { icon: '👥', label: 'Clientes', route: '/clientes' },
-  { icon: '📝', label: 'Auditoría', route: '/audit-logs' },
-];
+  menuItems = [
+    { icon: '📊', label: 'Dashboard', route: '/dashboard' },
+    { icon: '🏢', label: 'Bodegas', route: '/bodegas/list' },
+    { icon: '📦', label: 'Productos', route: '/productos/list' },
+    { icon: '📋', label: 'Kardex', route: '/kardex/list' },
+    { icon: '📦', label: 'Containers', route: '/containers' },
+    { icon: '🏷️', label: 'Lotes', route: '/lotes' },
+    { icon: '👥', label: 'Clientes', route: '/clientes' },
+    { icon: '📝', label: 'Auditoría', route: '/audit-logs' },
+  ];
 
   constructor(
     private authService: AuthService,

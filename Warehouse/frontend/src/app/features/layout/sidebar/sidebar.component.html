@@ -1,9 +1,10 @@
-<!-- main-layout.component.html -->
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
-    <h2 *ngIf="!isCollapsed">Inventario</h2>
-    <button class="toggle-btn" (click)="toggleSidebar()">
-      {{ isCollapsed ? '→' : '←' }}
+    <h2 *ngIf="!isCollapsed">Warehouse</h2>
+    <button class="toggle-btn" (click)="toggleSidebar()" title="Contraer/Expandir menú">
+      <!-- Flechas Unicode como fallback -->
+      <span *ngIf="!isCollapsed">◀</span>
+      <span *ngIf="isCollapsed">▶</span>
     </button>
   </div>
 
@@ -21,9 +22,9 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div class="user-info" *ngIf="currentUser && !isCollapsed">
+    <div class="user-info" *ngIf="currentUser">
       <div class="user-avatar">{{ currentUser.nombre.charAt(0) }}</div>
-      <div class="user-details">
+      <div class="user-details" *ngIf="!isCollapsed">
         <p class="user-name">{{ currentUser.nombre }}</p>
         <p class="user-role">{{ currentUser.rol }}</p>
       </div>
