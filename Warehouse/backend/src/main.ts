@@ -5,9 +5,22 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS
+  // Habilitar CORS según entorno
+ const allowedOrigins = [
+  'http://localhost:4200', // desarrollo
+  'https://sistema-bodega.onrender.com', // backend en Render
+  'https://emily-hrdz.github.io', // frontend GitHub Pages
+];
+
+
   app.enableCors({
-    origin: 'http://localhost:4200',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS origin ${origin} not allowed`));
+      }
+    },
     credentials: true,
   });
 
@@ -20,8 +33,9 @@ async function bootstrap() {
     }),
   );
 
+  // Puerto dinámico asignado por Render
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Backend corriendo en http://localhost:${port}`);
+  console.log(`🚀 Backend corriendo en puerto ${port}`);
 }
 bootstrap();
