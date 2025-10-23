@@ -41,13 +41,28 @@ export class KardexFormComponent implements OnInit {
       productoId: ['', Validators.required],
       tipoMovimientoId: ['', Validators.required],
       cantidad: ['', [Validators.required, Validators.min(0.001)]],
-      fecha: [new Date().toISOString().split('T')[0]],
+      fecha: [this.getCurrentDateFormatted()],
       observaciones: ['']
     });
   }
 
-  ngOnInit(): void {
+  // Método para obtener la fecha actual formateada correctamente
+  private getCurrentDateFormatted(): string {
+    const now = new Date();
+    return now.toISOString().split('T')[0];
+  }
+
+  // Método para convertir string a Date con hora mediodía
+  private convertToDate(dateString: string): Date {
+    if (!dateString) return new Date();
     
+    const date = new Date(dateString);
+    // Establecer a mediodía para evitar problemas de zona horaria
+    date.setHours(12, 0, 0, 0);
+    return date;
+  }
+
+  ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     if (id) {
       this.isEdit = true;
@@ -61,12 +76,16 @@ export class KardexFormComponent implements OnInit {
     this.loading = true;
     this.kardexService.getById(id).subscribe({
       next: (kardex) => {
+        // Convertir fecha al formato correcto para el input
+        const fecha = new Date(kardex.fecha);
+        const fechaFormatted = fecha.toISOString().split('T')[0];
+        
         this.kardexForm.patchValue({
           bodegaId: kardex.bodegaId,
           productoId: kardex.productoId,
           tipoMovimientoId: kardex.tipoMovimientoId,
           cantidad: kardex.cantidad,
-          fecha: new Date(kardex.fecha).toISOString().split('T')[0],
+          fecha: fechaFormatted,
           observaciones: kardex.observaciones
         });
         this.loadCatalogos();
@@ -121,7 +140,7 @@ export class KardexFormComponent implements OnInit {
       productoId: Number(this.kardexForm.value.productoId),
       tipoMovimientoId: Number(this.kardexForm.value.tipoMovimientoId),
       cantidad: Number(this.kardexForm.value.cantidad),
-      fecha: this.kardexForm.value.fecha,
+      fecha: this.convertToDate(this.kardexForm.value.fecha), 
       observaciones: this.kardexForm.value.observaciones
     };
 

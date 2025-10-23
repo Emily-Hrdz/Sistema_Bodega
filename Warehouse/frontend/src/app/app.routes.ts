@@ -83,6 +83,11 @@ export const routes: Routes = [
           import('./features/kardex/kardex-form/kardex-form.component').then(m => m.KardexFormComponent)
       },
       {
+       path: 'kardex/:id/edit',  // ← NUEVA RUTA PARA EDITAR
+       loadComponent: () =>
+          import('./features/kardex/kardex-form/kardex-form.component').then(m => m.KardexFormComponent)
+   },
+      {
         path: 'kardex/list',
         loadComponent: () =>
           import('./features/kardex/kardex-list/kardex-list.component').then(m => m.KardexListComponent)

@@ -26,7 +26,7 @@ export class KardexListComponent implements OnInit {
     this.loading = true;
     this.kardexService.getAll().subscribe({
       next: (data) => {
-        this.movimientos = data;
+        this.movimientos = data; 
         this.loading = false;
       },
       error: (err) => {
