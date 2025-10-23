@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router'; 
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -13,8 +14,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    
+  constructor(
+    private http: HttpClient,
+    private router: Router 
+  ) {
     const token = this.getToken();
     const user = localStorage.getItem('currentUser');
     if (token && user) {
@@ -40,6 +43,8 @@ export class AuthService {
     this.removeToken();
     this.currentUserSubject.next(null);
     localStorage.removeItem('currentUser');
+    
+    this.router.navigate(['/login']); 
   }
 
   isLoggedIn(): boolean {
