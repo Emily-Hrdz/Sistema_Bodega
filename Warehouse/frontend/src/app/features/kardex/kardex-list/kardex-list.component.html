@@ -2,57 +2,194 @@
   <div class="header">
     <h1>Movimientos Kardex</h1>
     <button class="btn btn-sm btn-primary" routerLink="/kardex/nuevo">
-      Nuevo Movimiento
+      + Nuevo Movimiento
     </button>
     <h2>Tipos de Movimiento</h2>
     <button class="btn btn-sm btn-primary" routerLink="/tipos-movimiento/nuevo">
-      Crear Tipo de Movimiento
+      + Crear Tipo de Movimiento
     </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section" *ngIf="showFilters">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Fecha Inicio</label>
+        <input type="date" [(ngModel)]="fechaInicio" (change)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Fecha Fin</label>
+        <input type="date" [(ngModel)]="fechaFin" (change)="applyFilters()">
+      </div>
+     
+      <div class="filter-group">
+        <label>Tipo de Operación</label>
+        <select [(ngModel)]="tipoOperacion" (change)="applyFilters()">
+          <option value="">Todos los tipos</option>
+          <option value="ENTRADA">Entrada</option>
+          <option value="SALIDA">Salida</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Búsqueda</label>
+        <input type="text" [(ngModel)]="searchTerm" (input)="onSearchChange()" 
+               placeholder="Buscar en bodega, producto...">
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-sm btn-secondary" (click)="clearFilters()">Limpiar Filtros</button>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary-cards" *ngIf="!loading && !error">
+    <div class="summary-card">
+      <h3>Entradas Totales</h3>
+      <span class="number positive">{{ getResumen().entradas }}</span>
+    </div>
+    <div class="summary-card">
+      <h3>Salidas Totales</h3>
+      <span class="number negative">{{ getResumen().salidas }}</span>
+    </div>
+    <div class="summary-card">
+      <h3>Saldo Final</h3>
+      <span class="number neutral">{{ getResumen().saldoFinal }}</span>
+    </div>
+    <div class="summary-card">
+      <h3>Total Movimientos</h3>
+      <span class="number info">{{ getResumen().totalMovimientos }}</span>
+    </div>
+  </div>
+
+  <!-- Gráficas SEPARADAS -->
+  <div class="charts-section" *ngIf="!loading && !error && filteredMovimientos.length > 0">
+    <div class="chart-header">
+      <h2>Dashboard de Inventario</h2>
+      <div class="chart-controls">
+        <select [(ngModel)]="chartTimeRange" (change)="renderCharts()">
+          <option value="day">Por Día</option>
+          <option value="week">Por Semana</option>
+          <option value="month">Por Mes</option>
+        </select>
+        <button class="btn btn-sm" 
+                [class.btn-primary]="chartType === 'line'"
+                (click)="changeChartType('line')">Línea</button>
+        <button class="btn btn-sm" 
+                [class.btn-primary]="chartType === 'bar'"
+                (click)="changeChartType('bar')">Barras</button>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <!-- Gráficas principales separadas -->
+      <div class="chart-container">
+        <h3>Evolución del Saldo</h3>
+        <canvas #saldoChart></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h3>Entradas/Compras</h3>
+        <canvas #entradasChart></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h3>Salidas/Ventas</h3>
+        <canvas #salidasChart></canvas>
+      </div>
+
+      <!-- Gráficas secundarias -->
+      
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">Cargando...</div>
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
-  <div class="table-container" *ngIf="!loading && !error">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Bodega</th>
-          <th>Producto</th>
-          <th>Tipo Movimiento</th>
-          <th>Cantidad</th>
-          <th>Saldo Anterior</th>
-          <th>Saldo Nuevo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let mov of movimientos">
-          <td>{{ mov.fecha | date:'MM/dd/yy' }}</td>
-          <td>{{ mov.bodega?.nombre }}</td>
-          <td>{{ mov.producto?.nombre }}</td>
-          <td>
-            <span [class]="mov.tipoMovimiento?.tipo === 'ENTRADA' ? 'badge-success' : 'badge-danger'">
-              {{ mov.tipoMovimiento?.nombre }}
-            </span>
-          </td>
-          <td>{{ mov.cantidad }}</td>
-          <td>{{ mov.saldoAnterior }}</td>
-          <td>{{ mov.saldoNuevo }}</td>
-          <td>
-            <button class="btn btn-sm btn-info" [routerLink]="['/kardex', mov.id]">
-              Ver
-            </button>
-            <button class="btn btn-sm btn-warning" [routerLink]="['/kardex', mov.id, 'edit']">
-              Editar
-            </button>
-            <button class="btn btn-sm btn-danger" (click)="deleteMovimiento(mov.id)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Tabla -->
+  <div class="table-section" *ngIf="!loading && !error">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ displayedMovimientos.length }} de {{ filteredMovimientos.length }} movimientos
+      </div>
+      <div class="table-actions">
+        <button class="btn btn-sm btn-secondary" (click)="toggleFilters()">
+          {{ showFilters ? 'Ocultar' : 'Mostrar' }} Filtros
+        </button>
+        <button class="btn btn-sm btn-success" (click)="exportToCSV()">
+          Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('fecha')" class="sortable">
+              Fecha {{ getSortIcon('fecha') }}
+            </th>
+            <th (click)="sortBy('bodega.nombre')" class="sortable">
+              Bodega {{ getSortIcon('bodega.nombre') }}
+            </th>
+            <th (click)="sortBy('producto.nombre')" class="sortable">
+              Producto {{ getSortIcon('producto.nombre') }}
+            </th>
+            <th (click)="sortBy('tipoMovimiento.tipo')" class="sortable">
+              Tipo Movimiento {{ getSortIcon('tipoMovimiento.tipo') }}
+            </th>
+            <th (click)="sortBy('cantidad')" class="sortable">
+              Cantidad {{ getSortIcon('cantidad') }}
+            </th>
+            <th (click)="sortBy('saldoAnterior')" class="sortable">
+              Saldo Anterior {{ getSortIcon('saldoAnterior') }}
+            </th>
+            <th (click)="sortBy('saldoNuevo')" class="sortable">
+              Saldo Nuevo {{ getSortIcon('saldoNuevo') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mov of displayedMovimientos">
+            <td>{{ mov.fecha | date:'MM/dd/yy' }}</td>
+            <td>{{ mov.bodega?.nombre }}</td>
+            <td>{{ mov.producto?.nombre }}</td>
+            <td>
+              <span [class]="mov.tipoMovimiento?.tipo === 'ENTRADA' ? 'badge-success' : 'badge-danger'">
+                {{ mov.tipoMovimiento?.nombre }}
+              </span>
+            </td>
+            <td>{{ mov.cantidad }}</td>
+            <td>{{ mov.saldoAnterior }}</td>
+            <td>{{ mov.saldoNuevo }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="btn btn-sm" (click)="previousPage()" [disabled]="currentPage === 1">‹ Anterior</button>
+      
+      <span class="page-numbers">
+        <span *ngFor="let page of getPageNumbers()">
+          <button *ngIf="page !== -1" 
+                  class="btn btn-sm" 
+                  [class.btn-primary]="page === currentPage"
+                  (click)="goToPage(page)">
+            {{ page }}
+          </button>
+          <span *ngIf="page === -1" class="ellipsis">...</span>
+        </span>
+      </span>
+
+      <button class="btn btn-sm" (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente ›</button>
+      
+      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size">
+        <option value="10">10 por página</option>
+        <option value="25">25 por página</option>
+        <option value="50">50 por página</option>
+        <option value="100">100 por página</option>
+      </select>
+    </div>
   </div>
 </div>

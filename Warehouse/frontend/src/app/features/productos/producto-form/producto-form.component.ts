@@ -31,9 +31,9 @@ export class ProductoFormComponent implements OnInit {
       codigo: ['', [Validators.required, Validators.maxLength(50)]],
       nombre: ['', [Validators.required, Validators.maxLength(200)]],
       descripcion: [''],
-      tipoProductoId: [null, Validators.required], // <--- Inicializamos como null
-      
-      unidadMedida: ['', Validators.maxLength(20)]
+      tipoProductoId: [null, Validators.required],
+      unidadMedida: ['', Validators.maxLength(20)],
+      activo: [true] // Valor por defecto: activo
     });
   }
 
@@ -68,9 +68,9 @@ export class ProductoFormComponent implements OnInit {
           codigo: producto.codigo,
           nombre: producto.nombre,
           descripcion: producto.descripcion,
-          tipoProductoId: producto.tipoProductoId, // ya es número
-          
-          unidadMedida: producto.unidadMedida
+          tipoProductoId: producto.tipoProductoId,
+          unidadMedida: producto.unidadMedida,
+          activo: producto.activo // Cargar el estado actual del producto
         });
         this.loading = false;
       },
@@ -87,7 +87,7 @@ export class ProductoFormComponent implements OnInit {
       this.loading = true;
       const productoData = {
         ...this.productoForm.value,
-        tipoProductoId: Number(this.productoForm.value.tipoProductoId) // <--- convertir a número
+        tipoProductoId: Number(this.productoForm.value.tipoProductoId)
       };
 
       const request = this.isEditMode && this.productoId

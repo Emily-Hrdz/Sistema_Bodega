@@ -1,48 +1,142 @@
 <div class="container">
-  <div class="header">
-    <h1>Bodegas</h1>
+ 
+
+   <div class="header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Bodegas</h1>
+        <p>Gestiona las bodegas de almacenamiento</p>
+      </div>
      <button class="btn btn-sm btn-primary" [routerLink]="['/bodegas', 'nuevo']">
-      Nueva Bodega
+      + Nueva Bodega
     </button>
+    </div>
+  </div>
+
+  <!-- Panel de Control -->
+  <div class="dashboard-panel" *ngIf="!loading && !error">
+    <h2>Resumen de Bodegas</h2>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3>Total Bodegas</h3>
+        <span class="stat-number">{{ bodegas.length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Bodegas Activas</h3>
+        <span class="stat-number success">{{ getBodegasActivas().length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Bodegas Inactivas</h3>
+        <span class="stat-number danger">{{ getBodegasInactivas().length }}</span>
+      </div>
+    </div>
+
+    <!-- Gráfica de Distribución -->
+    <div class="chart-section" *ngIf="bodegas.length > 0">
+      <div class="chart-header">
+        <h3>Distribución de Bodegas</h3>
+        <div class="chart-type-selector">
+          <button 
+            class="btn-chart-type {{ chartType === 'doughnut' ? 'active' : '' }}"
+            (click)="changeChartType('doughnut')"
+            title="Gráfica de Dona">
+            <span class="material-icons">donut_large</span> Dona
+          </button>
+          <button 
+            class="btn-chart-type {{ chartType === 'pie' ? 'active' : '' }}"
+            (click)="changeChartType('pie')"
+            title="Gráfica de Pastel">
+            <span class="material-icons">pie_chart</span> Pastel
+          </button>
+          <button 
+            class="btn-chart-type {{ chartType === 'bar' ? 'active' : '' }}"
+            (click)="changeChartType('bar')"
+            title="Gráfica de Barras">
+            <span class="material-icons">bar_chart</span> Barras
+          </button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="bodegasChart" #bodegasChart></canvas>
+      </div>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">Cargando...</div>
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
-  <div class="table-container" *ngIf="!loading && !error">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Ubicación</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let bodega of bodegas">
-          <td>{{ bodega.id }}</td>
-          <td>{{ bodega.nombre }}</td>
-          <td>{{ bodega.ubicacion || '-' }}</td>
-          <td>
-            <span [class]="bodega.activo ? 'badge-success' : 'badge-danger'">
-              {{ bodega.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-info" [routerLink]="['/bodegas', bodega.id]">
-              Ver
-            </button>
-            <button class="btn btn-sm btn-warning" [routerLink]="['/bodegas', bodega.id, 'edit']">
-              Editar
-            </button>
-            <button class="btn btn-sm btn-danger" (click)="deleteBodega(bodega.id)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Tabla de Bodegas Activas -->
+  <div class="table-section" *ngIf="!loading && !error && getBodegasActivas().length > 0">
+    <h2>Bodegas Activas</h2>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bodega of getBodegasActivas()">
+            <td>{{ bodega.id }}</td>
+            <td>{{ bodega.nombre }}</td>
+            <td>{{ bodega.ubicacion || '-' }}</td>
+            <td>
+              <span class="badge-success">
+                Activo
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning" [routerLink]="['/bodegas', bodega.id, 'edit']">
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla de Bodegas Inactivas -->
+  <div class="table-section" *ngIf="!loading && !error && getBodegasInactivas().length > 0">
+    <h2>Bodegas Inactivas</h2>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bodega of getBodegasInactivas()">
+            <td>{{ bodega.id }}</td>
+            <td>{{ bodega.nombre }}</td>
+            <td>{{ bodega.ubicacion || '-' }}</td>
+            <td>
+              <span class="badge-danger">
+                Inactivo
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning" [routerLink]="['/bodegas', bodega.id, 'edit']">
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay bodegas -->
+  <div *ngIf="!loading && !error && bodegas.length === 0" class="no-data">
+    <p>No hay bodegas registradas.</p>
   </div>
 </div>

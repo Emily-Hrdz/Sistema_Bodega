@@ -41,25 +41,23 @@
         rows="3"></textarea>
     </div>
 
-    <div class="form-group">
-      <label for="tipoProductoId">Tipo de Producto *</label>
-      <select 
-        id="tipoProductoId" 
-        formControlName="tipoProductoId" 
-        class="form-control"
-        [class.invalid]="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
-        <option value="">Seleccione un tipo</option>
-        <option *ngFor="let tipo of tiposProducto" [value]="tipo.id">
-          {{ tipo.nombre }}
-        </option>
-      </select>
-      <div class="error-message" *ngIf="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
-        El tipo de producto es requerido
-      </div>
-    </div>
-
     <div class="form-row">
-      
+      <div class="form-group">
+        <label for="tipoProductoId">Tipo de Producto *</label>
+        <select 
+          id="tipoProductoId" 
+          formControlName="tipoProductoId" 
+          class="form-control"
+          [class.invalid]="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
+          <option value="">Seleccione un tipo</option>
+          <option *ngFor="let tipo of tiposProducto" [value]="tipo.id">
+            {{ tipo.nombre }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="productoForm.get('tipoProductoId')?.invalid && productoForm.get('tipoProductoId')?.touched">
+          El tipo de producto es requerido
+        </div>
+      </div>
 
       <div class="form-group">
         <label for="unidadMedida">Unidad de Medida</label>
@@ -72,12 +70,27 @@
       </div>
     </div>
 
+    <!-- Campo Activo/Inactivo - Solo visible en modo edición -->
+    <div class="form-group" *ngIf="isEditMode">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          formControlName="activo"
+          class="checkbox-input">
+        <span class="checkmark"></span>
+        Producto Activo
+      </label>
+      <small class="helper-text">
+        Desmarcar para desactivar el producto
+      </small>
+    </div>
+
     <div class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
         Cancelar
       </button>
       <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid || loading">
-        {{ loading ? 'Guardando...' : 'Guardar' }}
+        {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear Producto') }}
       </button>
     </div>
   </form>

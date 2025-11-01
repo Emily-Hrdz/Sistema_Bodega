@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Clientes</h1>
     <button class="btn btn-primary" (click)="onCreate()">
-      Nuevo Cliente
+      + Nuevo Cliente
     </button>
   </div>
 
@@ -37,15 +37,11 @@
           </span>
         </td>
         <td class="actions">
-          <button class="btn btn-sm btn-info" (click)="onView(cliente.id)">
-            Ver
-          </button>
+         
           <button class="btn btn-sm btn-warning" (click)="onEdit(cliente.id)">
             Editar
           </button>
-          <button class="btn btn-sm btn-danger" (click)="onDelete(cliente.id)">
-            Eliminar
-          </button>
+        
         </td>
       </tr>
     </tbody>

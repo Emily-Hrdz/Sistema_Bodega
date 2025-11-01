@@ -1,49 +1,167 @@
 <div class="container">
+  <!-- Header Mejorado -->
   <div class="header">
-    <h1>Containers</h1>
-    <button class="btn btn-primary" (click)="onCreate()">
-      Nuevo Container
-    </button>
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Containers</h1>
+        <p>Gestiona los containers de almacenamiento</p>
+      </div>
+      <button class="btn btn-primary" (click)="onCreate()">
+        <span class="material-icons">add</span>
+        Nuevo Container
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <!-- Panel de Control -->
+  <div class="dashboard-panel" *ngIf="!loading && containers.length > 0">
+    <h2>Resumen de Containers</h2>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3>Total Containers</h3>
+        <span class="stat-number">{{ containers.length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Containers Activos</h3>
+        <span class="stat-number success">{{ getContainersActivos().length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Containers Inactivos</h3>
+        <span class="stat-number danger">{{ getContainersInactivos().length }}</span>
+      </div>
+    </div>
 
-  <div *ngIf="loading" class="loading">Cargando...</div>
-
-  <div *ngIf="!loading && containers.length === 0" class="empty-state">
-    No hay containers registrados
+    <!-- Gráfica de Distribución -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <h3>Distribución de Containers</h3>
+        <div class="chart-type-selector">
+          <button 
+            class="btn-chart-type {{ chartType === 'doughnut' ? 'active' : '' }}"
+            (click)="changeChartType('doughnut')"
+            title="Gráfica de Dona">
+            <span class="material-icons">donut_large</span> Dona
+          </button>
+          <button 
+            class="btn-chart-type {{ chartType === 'pie' ? 'active' : '' }}"
+            (click)="changeChartType('pie')"
+            title="Gráfica de Pastel">
+            <span class="material-icons">pie_chart</span> Pastel
+          </button>
+          <button 
+            class="btn-chart-type {{ chartType === 'bar' ? 'active' : '' }}"
+            (click)="changeChartType('bar')"
+            title="Gráfica de Barras">
+            <span class="material-icons">bar_chart</span> Barras
+          </button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="containersChart" #containersChart></canvas>
+      </div>
+    </div>
   </div>
 
-  <table *ngIf="!loading && containers.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Descripción</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let container of containers">
-        <td>{{ container.codigo }}</td>
-        <td>{{ container.descripcion || '-' }}</td>
-        <td>
-          <span [class]="container.activo ? 'badge-success' : 'badge-danger'">
-            {{ container.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-        <td class="actions">
-          <button class="btn btn-sm btn-info" (click)="onView(container.id)">
-            Ver
-          </button>
-          <button class="btn btn-sm btn-warning" (click)="onEdit(container.id)">
-            Editar
-          </button>
-          <button class="btn btn-sm btn-danger" (click)="onDelete(container.id)">
-            Eliminar
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Estados de carga y error -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando containers...</p>
+  </div>
+  
+  <div *ngIf="error" class="alert alert-error">
+    <span class="material-icons">error</span>
+    <div class="error-content">
+      <h3>Error al cargar containers</h3>
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Tabla de Containers Activos -->
+  <div class="table-section" *ngIf="!loading && getContainersActivos().length > 0">
+    <div class="section-header">
+      <h2>Containers Activos</h2>
+      <span class="badge badge-success">{{ getContainersActivos().length }} containers</span>
+    </div>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let container of getContainersActivos()">
+            <td class="code-cell">{{ container.codigo }}</td>
+            <td>{{ container.descripcion || '-' }}</td>
+            <td>
+              <span class="badge badge-success">
+                <span class="material-icons">check_circle</span>
+                Activo
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn btn-edit" (click)="onEdit(container.id)" title="Editar container">
+               
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla de Containers Inactivos -->
+  <div class="table-section" *ngIf="!loading && getContainersInactivos().length > 0">
+    <div class="section-header">
+      <h2>Containers Inactivos</h2>
+      <span class="badge badge-danger">{{ getContainersInactivos().length }} containers</span>
+    </div>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let container of getContainersInactivos()">
+            <td class="code-cell">{{ container.codigo }}</td>
+            <td>{{ container.descripcion || '-' }}</td>
+            <td>
+              <span class="badge badge-danger">
+                
+                Inactivo
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn btn-edit" (click)="onEdit(container.id)" title="Editar container">
+               
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!loading && containers.length === 0" class="no-data">
+    <div class="no-data-content">
+      <span class="material-icons">inventory_2</span>
+      <h3>No hay containers registrados</h3>
+      <p>Comienza agregando tu primer container de almacenamiento</p>
+      <button class="btn btn-primary" (click)="onCreate()">
+        <span class="material-icons">add</span>
+        Crear Primer Container
+      </button>
+    </div>
+  </div>
 </div>

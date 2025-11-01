@@ -16,14 +16,14 @@ export class SidebarComponent implements OnInit {
   isCollapsed = false;
 
   menuItems = [
-    { icon: '📊', label: 'Dashboard', route: '/dashboard' },
-    { icon: '🏢', label: 'Bodegas', route: '/bodegas/list' },
-    { icon: '📦', label: 'Productos', route: '/productos/list' },
-    { icon: '📋', label: 'Kardex', route: '/kardex/list' },
-    { icon: '📦', label: 'Containers', route: '/containers' },
-    { icon: '🏷️', label: 'Lotes', route: '/lotes' },
-    { icon: '👥', label: 'Clientes', route: '/clientes' },
-    { icon: '📝', label: 'Auditoría', route: '/audit-logs' },
+    //{ icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
+    { icon: 'warehouse', label: 'Bodegas', route: '/bodegas/list' },
+    { icon: 'inventory_2', label: 'Productos', route: '/productos/list' },
+    { icon: 'swap_horiz', label: 'Kardex', route: '/kardex/list' },
+    { icon: 'local_shipping', label: 'Containers', route: '/containers' },
+    { icon: 'sell', label: 'Lotes', route: '/lotes' },
+    { icon: 'people', label: 'Clientes', route: '/clientes' },
+    { icon: 'list_alt', label: 'Auditoría', route: '/audit-logs' },
   ];
 
   constructor(

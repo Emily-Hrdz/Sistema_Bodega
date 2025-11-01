@@ -1,10 +1,12 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
-    <h2 *ngIf="!isCollapsed">Warehouse</h2>
+    <div class="logo" *ngIf="!isCollapsed">
+      
+      <h2>Warehouse</h2>
+    </div>
     <button class="toggle-btn" (click)="toggleSidebar()" title="Contraer/Expandir menú">
-      <!-- Flechas Unicode como fallback -->
-      <span *ngIf="!isCollapsed">◀</span>
-      <span *ngIf="isCollapsed">▶</span>
+      <span class="material-icons" *ngIf="!isCollapsed">chevron_left</span>
+      <span class="material-icons" *ngIf="isCollapsed">chevron_right</span>
     </button>
   </div>
 
@@ -16,27 +18,27 @@
       class="nav-item"
       [title]="item.label"
     >
-      <span class="icon">{{ item.icon }}</span>
+      <span class="material-icons">{{ item.icon }}</span>
       <span class="label" *ngIf="!isCollapsed">{{ item.label }}</span>
     </a>
   </nav>
 
   <div class="sidebar-footer">
     <div class="user-info" *ngIf="currentUser">
-      <div class="user-avatar">{{ currentUser.nombre.charAt(0) }}</div>
+      
       <div class="user-details" *ngIf="!isCollapsed">
         <p class="user-name">{{ currentUser.nombre }}</p>
         <p class="user-role">{{ currentUser.rol }}</p>
       </div>
     </div>
-    <button class="logout-btn" (click)="logout()" [title]="'Cerrar Sesión'">
-      <span class="icon">🚪</span>
+    <button class="logout-btn" (click)="logout()" [title]="isCollapsed ? 'Cerrar Sesión' : ''">
+      <span class="material-icons">logout</span>
       <span *ngIf="!isCollapsed">Cerrar Sesión</span>
     </button>
   </div>
 </aside>
 
 <!-- Contenedor principal donde se renderizan todas las páginas hijas -->
-<div class="main-content">
+<div class="main-content" [class.sidebar-collapsed]="isCollapsed">
   <router-outlet></router-outlet>
 </div>

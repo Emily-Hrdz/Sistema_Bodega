@@ -1,55 +1,199 @@
 <div class="container">
+  <!-- Header Mantenido Simple -->
   <div class="header">
     <h1>Productos</h1>
-     <button class="btn btn-sm btn-primary" [routerLink]="['/productos', 'nuevo']">
-      Nuevo Producto
+    <button class="btn btn-sm btn-primary" [routerLink]="['/productos', 'nuevo']">
+      + Nuevo Producto
     </button>
     <p>Administra los tipos de producto de tu inventario.</p>
-    <h2>Tipos de Producto </h2>
+    <h2>Tipos de Producto</h2>
     <button class="btn btn-sm btn-primary" routerLink="/tipos-producto">
-      Crear Tipo de Producto
+      + Crear Tipo de Producto
     </button>
   </div>
 
-  <div *ngIf="loading" class="loading">Cargando...</div>
-  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <!-- Filtros Rápidos -->
+  <div class="filters-panel" *ngIf="!loading && !error && productos.length > 0">
+    <div class="filter-group">
+      <label>Buscar:</label>
+      <input type="text" placeholder="Código o nombre..." 
+             [(ngModel)]="searchTerm" (input)="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>Tipo:</label>
+      <select [(ngModel)]="selectedType" (change)="applyFilters()">
+        <option value="">Todos los tipos</option>
+        <option *ngFor="let tipo of getTiposUnicos()" [value]="tipo">{{ tipo }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Estado:</label>
+      <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
+        <option value="">Todos</option>
+        <option value="activo">Activos</option>
+        <option value="inactivo">Inactivos</option>
+      </select>
+    </div>
+    <button class="btn btn-sm btn-outline" (click)="clearFilters()" *ngIf="hasActiveFilters">
+      Limpiar Filtros
+    </button>
+  </div>
 
-  <div class="table-container" *ngIf="!loading && !error">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Unidad</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let producto of productos">
-          <td>{{ producto.codigo }}</td>
-          <td>{{ producto.nombre }}</td>
-          <td>{{ producto.tipoProducto?.nombre || '-' }}</td>
-          <td>{{ producto.unidadMedida }}</td>
-          <td>
-            <span [class]="producto.activo ? 'badge-success' : 'badge-danger'">
-              {{ producto.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-info" [routerLink]="['/productos', producto.id]">
-              Ver
-            </button>
-            <button class="btn btn-sm btn-warning" [routerLink]="['/productos', producto.id, 'edit']">
-              Editar
-            </button>
-            <button class="btn btn-sm btn-danger" (click)="deleteProducto(producto.id)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Panel de Control -->
+  <div class="dashboard-panel" *ngIf="!loading && !error">
+    <h2>Resumen de Productos</h2>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3>Total Productos</h3>
+        <span class="stat-number">{{ productos.length }}</span>
+        <small *ngIf="hasActiveFilters" class="filtered-count">
+          ({{ filteredProductos.length }} filtrados)
+        </small>
+      </div>
+      <div class="stat-card">
+        <h3>Productos Activos</h3>
+        <span class="stat-number success">{{ getProductosActivos().length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Productos Inactivos</h3>
+        <span class="stat-number danger">{{ getProductosInactivos().length }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Tipos Diferentes</h3>
+        <span class="stat-number info">{{ getTiposUnicos().length }}</span>
+      </div>
+    </div>
+
+    <!-- Gráfica de Barras - Estilo compatible -->
+ <!-- En la sección de la gráfica -->
+<div class="chart-section" *ngIf="getProductosPorTipo().length > 0">
+  <div class="chart-header">
+    <h3>Distribución de Productos Activos por Tipo</h3>
+    <div class="chart-controls">
+      <div class="chart-type-selector">
+        <button 
+          class="btn-chart-type {{ chartType === 'pie' ? 'active' : '' }}"
+          (click)="changeChartType('pie')"
+          title="Gráfica de Pastel">
+          <i class="fas fa-chart-pie"></i> Pastel
+        </button>
+        <button 
+          class="btn-chart-type {{ chartType === 'bar' ? 'active' : '' }}"
+          (click)="changeChartType('bar')"
+          title="Gráfica de Barras Horizontal">
+          <i class="fas fa-chart-bar"></i> Barras
+        </button>
+        <button 
+          class="btn-chart-type {{ chartType === 'doughnut' ? 'active' : '' }}"
+          (click)="changeChartType('doughnut')"
+          title="Gráfica de Dona">
+          <i class="fas fa-chart-pie"></i> Dona
+        </button>
+      </div>
+      <button class="btn-toggle-chart" (click)="toggleChart()" title="Mostrar/Ocultar gráfica">
+        <i class="fas" [class.fa-eye]="!showChart" [class.fa-eye-slash]="showChart"></i>
+        {{ showChart ? 'Ocultar' : 'Mostrar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="chart-container" *ngIf="showChart">
+    <canvas id="productosChart" #productosChart></canvas>
+  </div>
+
+  <div class="chart-footer" *ngIf="getProductosPorTipo().length > 10">
+    <small>
+      <i class="fas fa-info-circle"></i>
+      Mostrando los 10 tipos más comunes de {{ getProductosPorTipo().length }} totales (solo productos activos)
+    </small>
+  </div>
+</div>
+
+  <!-- Tabla con Paginación -->
+  <div class="table-section" *ngIf="!loading && !error && filteredProductos.length > 0">
+    <div class="section-header">
+      <h2>Productos 
+        <span class="results-count">({{ filteredProductos.length }} 
+          {{ hasActiveFilters ? 'filtrados' : 'totales' }})
+        </span>
+      </h2>
+      <div class="table-controls">
+        <div class="pagination-controls">
+          <button class="btn btn-sm" (click)="previousPage()" [disabled]="currentPage === 1">
+            ‹ Anterior
+          </button>
+          <span class="page-info">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+          <button class="btn btn-sm" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            Siguiente ›
+          </button>
+        </div>
+        <div class="page-size-selector">
+          <label>Mostrar:</label>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('codigo')" class="sortable">
+              Código <span class="sort-icon">{{ getSortIcon('codigo') }}</span>
+            </th>
+            <th (click)="sortBy('nombre')" class="sortable">
+              Nombre <span class="sort-icon">{{ getSortIcon('nombre') }}</span>
+            </th>
+            <th (click)="sortBy('tipoProducto.nombre')" class="sortable">
+              Tipo <span class="sort-icon">{{ getSortIcon('tipoProducto.nombre') }}</span>
+            </th>
+            <th>Unidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let producto of getDisplayedProducts()">
+            <td>{{ producto.codigo }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.tipoProducto?.nombre || '-' }}</td>
+            <td>{{ producto.unidadMedida }}</td>
+            <td>
+              <span [class]="producto.activo ? 'badge-success' : 'badge-danger'">
+                {{ producto.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning" [routerLink]="['/productos', producto.id, 'edit']">
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación Inferior -->
+    <div class="pagination-footer">
+      <div class="pagination-info">
+        Mostrando {{ getDisplayedProducts().length }} de {{ filteredProductos.length }} productos
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay productos -->
+  <div *ngIf="!loading && !error && filteredProductos.length === 0" class="no-data">
+    <p *ngIf="hasActiveFilters">No hay productos que coincidan con los filtros aplicados.</p>
+    <p *ngIf="!hasActiveFilters">No hay productos registrados.</p>
+    <button *ngIf="hasActiveFilters" class="btn btn-primary" (click)="clearFilters()">
+      Limpiar Filtros
+    </button>
   </div>
 </div>

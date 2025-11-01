@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Lotes</h1>
     <button class="btn btn-primary" (click)="onCreate()">
-      Nuevo Lote
+      + Nuevo Lote
     </button>
   </div>
 
@@ -33,15 +33,11 @@
           </span>
         </td>
         <td class="actions">
-          <button class="btn btn-sm btn-info" (click)="onView(lote.id)">
-            Ver
-          </button>
+          
           <button class="btn btn-sm btn-warning" (click)="onEdit(lote.id)">
             Editar
           </button>
-          <button class="btn btn-sm btn-danger" (click)="onDelete(lote.id)">
-            Eliminar
-          </button>
+          
         </td>
       </tr>
     </tbody>
