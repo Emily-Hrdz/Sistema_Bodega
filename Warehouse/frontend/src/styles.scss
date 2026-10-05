@@ -1,4 +1,72 @@
 /* You can add global styles to this file, and also import other style files */
+/* Apariencia compartida entre los catálogos. */
+.record-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: #155d38;
+}
+.record-status.is-active { background: #d4edda; color: #155d38; }
+.record-status.is-inactive { background: #f8d7da; color: #842029; }
+.record-delete {
+  border: 0;
+  border-radius: 4px;
+  padding: 0.35rem 0.65rem;
+  margin: 0.25rem;
+  background: #b42332;
+  color: #fff;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.record-delete:disabled { opacity: 0.6; cursor: wait; }
+.record-delete:focus-visible { outline: 3px solid #333; outline-offset: 2px; }
+/* Dimensiones y alineación uniformes en todos los catálogos. */
+.catalog-table.table th.status-cell,
+.catalog-table.table td.status-cell,
+.catalog-table.table th.actions-cell,
+.catalog-table.table td.actions-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+.catalog-table .status-cell { width: 136px; min-width: 136px; }
+.catalog-table .actions-cell { width: 256px; min-width: 256px; }
+.catalog-table .record-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.catalog-table .record-status,
+.catalog-table .record-action {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 104px;
+  width: 104px;
+  height: 36px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.catalog-table .record-status {
+  border-radius: 999px;
+  font-weight: 500;
+  cursor: default;
+}
+.catalog-table .record-edit { background: #ffc107; color: #332600; cursor: pointer; }
+.catalog-table .record-action:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
 /* Variables */
 :root {
   --primary-color: #007bff;

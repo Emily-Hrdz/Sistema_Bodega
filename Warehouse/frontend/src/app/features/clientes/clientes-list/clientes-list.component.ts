@@ -1,3 +1,5 @@
+import { ViewChild as DialogViewChild } from '@angular/core';
+import { DeleteDialogComponent } from '../../../shared/delete-dialog.component';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -6,13 +8,15 @@ import { ClienteService, Cliente } from '../../../core/services/cliente.service'
 @Component({
   selector: 'app-clientes-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [DeleteDialogComponent, CommonModule],
   templateUrl: './clientes-list.component.html',
   styleUrls: ['./clientes-list.component.scss']
 })
 export class ClientesListComponent implements OnInit {
   clientes: Cliente[] = [];
   loading = false;
+  @DialogViewChild(DeleteDialogComponent, { static: true }) deleteDialog!: DeleteDialogComponent;
+  deletingId: number | null = null;
   error: string | null = null;
 
   constructor(
@@ -25,6 +29,7 @@ export class ClientesListComponent implements OnInit {
   }
 
   loadClientes(): void {
+    this.error = '';
     this.loading = true;
     this.clienteService.getAll().subscribe({
       next: (data) => {
@@ -51,17 +56,22 @@ export class ClientesListComponent implements OnInit {
     this.router.navigate(['/clientes', id, 'edit']);
   }
 
-  onDelete(id: number): void {
-    if (confirm('¿Está seguro de eliminar este cliente?')) {
-      this.clienteService.delete(id).subscribe({
-        next: () => {
-          this.loadClientes();
-        },
-        error: (err) => {
-          this.error = 'Error al eliminar cliente';
-          console.error(err);
-        }
-      });
-    }
+  async onDelete(id: number): Promise<void> {
+    if (this.deletingId !== null) return;
+    const record = this.clientes.find(item => item.id === id);
+    if (!record) return;
+    if (!await this.deleteDialog.open(record.nombre)) return;
+    this.deletingId = id;
+    this.error = '';
+    this.clienteService.delete(id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.loadClientes();
+      },
+      error: (err) => {
+        this.deletingId = null;
+        this.error = err.error?.message || 'No se pudo eliminar el cliente. Inténtelo nuevamente.';
+      }
+    });
   }
 }

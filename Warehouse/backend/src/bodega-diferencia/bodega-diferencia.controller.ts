@@ -8,12 +8,15 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BodegaDiferenciaService } from './bodega-diferencia.service';
 import { CreateBodegaDiferenciaDto } from './dto/create-bodega-diferencia.dto';
 import { UpdateBodegaDiferenciaDto } from './dto/update-bodega-diferencia.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('api/bodegas-diferencias')
+@UseGuards(JwtAuthGuard)
 export class BodegaDiferenciaController {
   constructor(private readonly bodegaDiferenciaService: BodegaDiferenciaService) {}
 

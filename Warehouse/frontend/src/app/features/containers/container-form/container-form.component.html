@@ -1,5 +1,5 @@
 <div class="container">
-  <h1>{{ isEdit ? 'Editar' : 'Nuevo' }} Container</h1>
+  <h1>{{ isEdit ? 'Editar' : 'Nuevo' }} contenedor</h1>
 
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
@@ -39,7 +39,7 @@
     <div class="form-actions">
       <button type="submit" class="btn btn-primary" 
               [disabled]="containerForm.invalid || loading">
-        {{ isEdit ? 'Actualizar' : 'Crear' }} Container
+        {{ isEdit ? 'Actualizar' : 'Crear' }} contenedor
       </button>
       <button type="button" class="btn btn-secondary" (click)="onCancel()">
         Cancelar

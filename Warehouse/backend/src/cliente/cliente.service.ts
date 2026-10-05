@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
@@ -47,8 +47,19 @@ export class ClienteService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.cliente.delete({
-      where: { id },
-    });
+    try {
+      return await this.prisma.$transaction(async tx => {
+        const movimientos = await tx.kardex.count({ where: { clienteId: id } });
+        if (movimientos) {
+          throw new ConflictException('Este registro tiene movimientos o conteos asociados. Desactívelo para conservar el historial.');
+        }
+        return tx.cliente.delete({ where: { id } });
+      }, { isolationLevel: 'Serializable' });
+    } catch (error) {
+      if (error.code === 'P2003' || error.code === 'P2034') {
+        throw new ConflictException('No se puede eliminar: el registro está en uso. Actualice la lista o desactívelo.');
+      }
+      throw error;
+    }
   }
 }

@@ -1,1 +1,10 @@
 v/
+
+# Local artifacts and credentials are never part of the public demo.
+/output/
+/tmp/
+**/.env
+**/.env.*
+!**/.env.example
+*.dump
+*.backup

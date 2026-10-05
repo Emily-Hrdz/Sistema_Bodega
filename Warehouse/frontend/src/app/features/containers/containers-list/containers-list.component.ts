@@ -1,3 +1,5 @@
+import { ViewChild as DialogViewChild } from '@angular/core';
+import { DeleteDialogComponent } from '../../../shared/delete-dialog.component';
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -8,7 +10,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-containers-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [DeleteDialogComponent, CommonModule],
   templateUrl: './containers-list.component.html',
   styleUrls: ['./containers-list.component.scss']
 })
@@ -17,6 +19,8 @@ export class ContainersListComponent implements OnInit, AfterViewInit {
   
   containers: Container[] = [];
   loading = false;
+  @DialogViewChild(DeleteDialogComponent, { static: true }) deleteDialog!: DeleteDialogComponent;
+  deletingId: number | null = null;
   error: string | null = null;
   private chart: any;
 
@@ -37,6 +41,7 @@ export class ContainersListComponent implements OnInit, AfterViewInit {
   }
 
   loadContainers(): void {
+    this.error = '';
     this.loading = true;
     this.containerService.getAll().subscribe({
       next: (data) => {
@@ -48,9 +53,28 @@ export class ContainersListComponent implements OnInit, AfterViewInit {
         }, 100);
       },
       error: (err) => {
-        this.error = 'Error al cargar containers';
+        this.error = 'Error al cargar contenedores';
         this.loading = false;
         console.error(err);
+      }
+    });
+  }
+
+  async onDelete(id: number): Promise<void> {
+    if (this.deletingId !== null) return;
+    const record = this.containers.find(item => item.id === id);
+    if (!record) return;
+    if (!await this.deleteDialog.open(record.codigo)) return;
+    this.deletingId = id;
+    this.error = '';
+    this.containerService.delete(id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.loadContainers();
+      },
+      error: (err) => {
+        this.deletingId = null;
+        this.error = err.error?.message || 'No se pudo eliminar el contenedor. Inténtelo nuevamente.';
       }
     });
   }
@@ -84,7 +108,7 @@ export class ContainersListComponent implements OnInit, AfterViewInit {
     const inactivos = this.getContainersInactivos().length;
     
     return {
-      labels: ['Containers Activos', 'Containers Inactivos'],
+      labels: ['Contenedores activos', 'Contenedores inactivos'],
       datasets: [{
         data: [activos, inactivos],
         backgroundColor: ['#28a745', '#dc3545'],
@@ -125,9 +149,9 @@ export class ContainersListComponent implements OnInit, AfterViewInit {
             callbacks: {
               label: (context: any) => {
                 const label = context.label || '';
-                const value = context.parsed;
+                const value = context.dataset.data[context.dataIndex];
                 const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-                const percentage = Math.round((value / total) * 100);
+                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
                 return `${label}: ${value} (${percentage}%)`;
               }
             }

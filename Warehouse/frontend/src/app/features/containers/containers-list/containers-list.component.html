@@ -3,30 +3,30 @@
   <div class="header">
     <div class="header-content">
       <div class="title-section">
-        <h1>Containers</h1>
-        <p>Gestiona los containers de almacenamiento</p>
+        <h1>Contenedores</h1>
+        <p>Gestiona los contenedores de almacenamiento</p>
       </div>
       <button class="btn btn-primary" (click)="onCreate()">
         <span class="material-icons">add</span>
-        Nuevo Container
+        Nuevo contenedor
       </button>
     </div>
   </div>
 
   <!-- Panel de Control -->
   <div class="dashboard-panel" *ngIf="!loading && containers.length > 0">
-    <h2>Resumen de Containers</h2>
+    <h2>Resumen de contenedores</h2>
     <div class="stats-container">
       <div class="stat-card">
-        <h3>Total Containers</h3>
+        <h3>Total de contenedores</h3>
         <span class="stat-number">{{ containers.length }}</span>
       </div>
       <div class="stat-card">
-        <h3>Containers Activos</h3>
+        <h3>Contenedores activos</h3>
         <span class="stat-number success">{{ getContainersActivos().length }}</span>
       </div>
       <div class="stat-card">
-        <h3>Containers Inactivos</h3>
+        <h3>Contenedores inactivos</h3>
         <span class="stat-number danger">{{ getContainersInactivos().length }}</span>
       </div>
     </div>
@@ -34,7 +34,7 @@
     <!-- Gráfica de Distribución -->
     <div class="chart-section">
       <div class="chart-header">
-        <h3>Distribución de Containers</h3>
+        <h3>Distribución de contenedores</h3>
         <div class="chart-type-selector">
           <button 
             class="btn-chart-type {{ chartType === 'doughnut' ? 'active' : '' }}"
@@ -65,13 +65,13 @@
   <!-- Estados de carga y error -->
   <div *ngIf="loading" class="loading-state">
     <div class="spinner"></div>
-    <p>Cargando containers...</p>
+    <p>Cargando contenedores...</p>
   </div>
   
   <div *ngIf="error" class="alert alert-error">
     <span class="material-icons">error</span>
     <div class="error-content">
-      <h3>Error al cargar containers</h3>
+      <h3>No se pudo completar la operación</h3>
       <p>{{ error }}</p>
     </div>
   </div>
@@ -79,35 +79,32 @@
   <!-- Tabla de Containers Activos -->
   <div class="table-section" *ngIf="!loading && getContainersActivos().length > 0">
     <div class="section-header">
-      <h2>Containers Activos</h2>
-      <span class="badge badge-success">{{ getContainersActivos().length }} containers</span>
+      <h2>Contenedores activos</h2>
+      <span class="badge badge-success">{{ getContainersActivos().length }} contenedores</span>
     </div>
     <div class="table-container">
-      <table class="table">
+      <table class="table catalog-table">
         <thead>
           <tr>
             <th>Código</th>
             <th>Descripción</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th class="status-cell">Estado</th>
+            <th class="actions-cell">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let container of getContainersActivos()">
             <td class="code-cell">{{ container.codigo }}</td>
             <td>{{ container.descripcion || '-' }}</td>
-            <td>
-              <span class="badge badge-success">
-                <span class="material-icons">check_circle</span>
-                Activo
-              </span>
-            </td>
-            <td class="actions">
-              <button class="btn btn-edit" (click)="onEdit(container.id)" title="Editar container">
+            <td class="status-cell"><span class="record-status is-active">Activo</span></td>
+            <td class="actions-cell"><div class="record-actions"><button class="record-action record-edit" (click)="onEdit(container.id)" title="Editar contenedor">
                
                 Editar
               </button>
-            </td>
+              <button type="button" class="record-action record-delete" (click)="onDelete(container.id)" [disabled]="deletingId !== null" [attr.aria-label]="'Eliminar ' + container.codigo">
+                {{ deletingId === container.id ? 'Eliminando…' : 'Eliminar' }}
+              </button>
+            </div></td>
           </tr>
         </tbody>
       </table>
@@ -117,35 +114,32 @@
   <!-- Tabla de Containers Inactivos -->
   <div class="table-section" *ngIf="!loading && getContainersInactivos().length > 0">
     <div class="section-header">
-      <h2>Containers Inactivos</h2>
-      <span class="badge badge-danger">{{ getContainersInactivos().length }} containers</span>
+      <h2>Contenedores inactivos</h2>
+      <span class="badge badge-danger">{{ getContainersInactivos().length }} contenedores</span>
     </div>
     <div class="table-container">
-      <table class="table">
+      <table class="table catalog-table">
         <thead>
           <tr>
             <th>Código</th>
             <th>Descripción</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th class="status-cell">Estado</th>
+            <th class="actions-cell">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let container of getContainersInactivos()">
             <td class="code-cell">{{ container.codigo }}</td>
             <td>{{ container.descripcion || '-' }}</td>
-            <td>
-              <span class="badge badge-danger">
-                
-                Inactivo
-              </span>
-            </td>
-            <td class="actions">
-              <button class="btn btn-edit" (click)="onEdit(container.id)" title="Editar container">
+            <td class="status-cell"><span class="record-status is-inactive">Inactivo</span></td>
+            <td class="actions-cell"><div class="record-actions"><button class="record-action record-edit" (click)="onEdit(container.id)" title="Editar contenedor">
                
                 Editar
               </button>
-            </td>
+              <button type="button" class="record-action record-delete" (click)="onDelete(container.id)" [disabled]="deletingId !== null" [attr.aria-label]="'Eliminar ' + container.codigo">
+                {{ deletingId === container.id ? 'Eliminando…' : 'Eliminar' }}
+              </button>
+            </div></td>
           </tr>
         </tbody>
       </table>
@@ -156,12 +150,13 @@
   <div *ngIf="!loading && containers.length === 0" class="no-data">
     <div class="no-data-content">
       <span class="material-icons">inventory_2</span>
-      <h3>No hay containers registrados</h3>
-      <p>Comienza agregando tu primer container de almacenamiento</p>
+      <h3>No hay contenedores registrados</h3>
+      <p>Comienza agregando tu primer contenedor de almacenamiento</p>
       <button class="btn btn-primary" (click)="onCreate()">
         <span class="material-icons">add</span>
-        Crear Primer Container
+        Crear primer contenedor
       </button>
     </div>
   </div>
 </div>
+<app-delete-dialog></app-delete-dialog>

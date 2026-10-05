@@ -1,4 +1,5 @@
 <div class="container">
+  <div *ngIf="error" class="alert alert-error" role="alert">{{ error }}</div>
   <!-- Header Mantenido Simple -->
   <div class="header">
     <h1>Productos</h1>
@@ -13,7 +14,7 @@
   </div>
 
   <!-- Filtros Rápidos -->
-  <div class="filters-panel" *ngIf="!loading && !error && productos.length > 0">
+  <div class="filters-panel" *ngIf="!loading && productos.length > 0">
     <div class="filter-group">
       <label>Buscar:</label>
       <input type="text" placeholder="Código o nombre..." 
@@ -110,7 +111,7 @@
 </div>
 
   <!-- Tabla con Paginación -->
-  <div class="table-section" *ngIf="!loading && !error && filteredProductos.length > 0">
+  <div class="table-section" *ngIf="!loading && filteredProductos.length > 0">
     <div class="section-header">
       <h2>Productos 
         <span class="results-count">({{ filteredProductos.length }} 
@@ -142,7 +143,7 @@
     </div>
 
     <div class="table-container">
-      <table class="table">
+      <table class="table catalog-table">
         <thead>
           <tr>
             <th (click)="sortBy('codigo')" class="sortable">
@@ -155,8 +156,8 @@
               Tipo <span class="sort-icon">{{ getSortIcon('tipoProducto.nombre') }}</span>
             </th>
             <th>Unidad</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th class="status-cell">Estado</th>
+            <th class="actions-cell">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -165,16 +166,16 @@
             <td>{{ producto.nombre }}</td>
             <td>{{ producto.tipoProducto?.nombre || '-' }}</td>
             <td>{{ producto.unidadMedida }}</td>
-            <td>
-              <span [class]="producto.activo ? 'badge-success' : 'badge-danger'">
+            <td class="status-cell"><span class="record-status" [class.is-active]="producto.activo" [class.is-inactive]="!producto.activo">
                 {{ producto.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-            <td>
-              <button class="btn btn-sm btn-warning" [routerLink]="['/productos', producto.id, 'edit']">
+              </span></td>
+            <td class="actions-cell"><div class="record-actions"><button class="record-action record-edit" [routerLink]="['/productos', producto.id, 'edit']">
                 Editar
               </button>
-            </td>
+              <button type="button" class="record-action record-delete" (click)="deleteProducto(producto.id)" [disabled]="deletingId !== null" [attr.aria-label]="'Eliminar ' + producto.codigo">
+                {{ deletingId === producto.id ? 'Eliminando…' : 'Eliminar' }}
+              </button>
+            </div></td>
           </tr>
         </tbody>
       </table>
@@ -189,7 +190,7 @@
   </div>
 
   <!-- Mensaje cuando no hay productos -->
-  <div *ngIf="!loading && !error && filteredProductos.length === 0" class="no-data">
+  <div *ngIf="!loading && filteredProductos.length === 0" class="no-data">
     <p *ngIf="hasActiveFilters">No hay productos que coincidan con los filtros aplicados.</p>
     <p *ngIf="!hasActiveFilters">No hay productos registrados.</p>
     <button *ngIf="hasActiveFilters" class="btn btn-primary" (click)="clearFilters()">
@@ -197,3 +198,4 @@
     </button>
   </div>
 </div>
+<app-delete-dialog></app-delete-dialog>

@@ -42,6 +42,7 @@ export class KardexListComponent implements OnInit, AfterViewInit {
   // Filtros
   fechaInicio: string = '';
   fechaFin: string = '';
+  dateFilterError = '';
   bodegaId: number | null = null;
   productoId: number | null = null;
   tipoOperacion: string = '';
@@ -60,7 +61,6 @@ export class KardexListComponent implements OnInit, AfterViewInit {
 
   // Gráficas
   chartType: 'line' | 'bar' = 'line';
-  chartTimeRange: 'day' | 'week' | 'month' = 'month';
 
   constructor(
     private kardexService: KardexService,
@@ -69,8 +69,8 @@ export class KardexListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadInitialData();
     this.setDefaultDates();
+    this.loadInitialData();
   }
 
   ngAfterViewInit() {
@@ -86,8 +86,14 @@ export class KardexListComponent implements OnInit, AfterViewInit {
     const lastMonth = new Date();
     lastMonth.setMonth(today.getMonth() - 1);
     
-    this.fechaInicio = lastMonth.toISOString().split('T')[0];
-    this.fechaFin = today.toISOString().split('T')[0];
+    this.fechaInicio = this.localDateKey(lastMonth);
+    this.fechaFin = this.localDateKey(today);
+  }
+
+  localDateKey(value: string | Date): string {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
   loadInitialData(): void {
@@ -153,16 +159,16 @@ export class KardexListComponent implements OnInit, AfterViewInit {
   applyFilters(): void {
     let filtered = this.movimientos;
 
-    // Filtro por fechas
-    if (this.fechaInicio) {
-      const startDate = new Date(this.fechaInicio);
-      filtered = filtered.filter(mov => new Date(mov.fecha) >= startDate);
-    }
-
-    if (this.fechaFin) {
-      const endDate = new Date(this.fechaFin);
-      endDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(mov => new Date(mov.fecha) <= endDate);
+    // Comparar los mismos días locales que muestra la tabla, incluyendo ambos extremos.
+    this.dateFilterError = this.fechaInicio && this.fechaFin && this.fechaInicio > this.fechaFin
+      ? 'La fecha de inicio no puede ser posterior a la fecha de fin.' : '';
+    if (this.fechaInicio || this.fechaFin) {
+      filtered = filtered.filter(mov => {
+        const day = this.localDateKey(mov.fecha);
+        return !!day && !this.dateFilterError &&
+          (!this.fechaInicio || day >= this.fechaInicio) &&
+          (!this.fechaFin || day <= this.fechaFin);
+      });
     }
 
     // Filtro por bodega
@@ -767,11 +773,6 @@ export class KardexListComponent implements OnInit, AfterViewInit {
 
   changeChartType(type: 'line' | 'bar'): void {
     this.chartType = type;
-    this.renderCharts();
-  }
-
-  changeTimeRange(range: 'day' | 'week' | 'month'): void {
-    this.chartTimeRange = range;
     this.renderCharts();
   }
 

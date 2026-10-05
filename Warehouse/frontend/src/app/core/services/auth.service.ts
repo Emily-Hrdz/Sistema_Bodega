@@ -48,7 +48,22 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (typeof payload.exp === 'number' && payload.exp * 1000 > Date.now()) {
+        return true;
+      }
+    } catch {
+      // Los tokens dañados también requieren iniciar sesión nuevamente.
+    }
+
+    this.removeToken();
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
+    return false;
   }
 
   getToken(): string | null {

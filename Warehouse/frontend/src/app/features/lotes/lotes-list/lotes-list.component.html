@@ -14,32 +14,32 @@
     No hay lotes registrados
   </div>
 
-  <table *ngIf="!loading && lotes.length > 0" class="table">
+  <table *ngIf="!loading && lotes.length > 0" class="table catalog-table">
     <thead>
       <tr>
         <th>Código</th>
         <th>Fecha Vencimiento</th>
-        <th>Estado</th>
-        <th>Acciones</th>
+        <th class="status-cell">Estado</th>
+        <th class="actions-cell">Acciones</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let lote of lotes">
         <td>{{ lote.codigo }}</td>
         <td>{{ formatDate(lote.fechaVencimiento) }}</td>
-        <td>
-          <span [class]="lote.activo ? 'badge-success' : 'badge-danger'">
+        <td class="status-cell"><span class="record-status" [class.is-active]="lote.activo" [class.is-inactive]="!lote.activo">
             {{ lote.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-        <td class="actions">
-          
-          <button class="btn btn-sm btn-warning" (click)="onEdit(lote.id)">
+          </span></td>
+        <td class="actions-cell"><div class="record-actions"><button class="record-action record-edit" (click)="onEdit(lote.id)">
             Editar
           </button>
+              <button type="button" class="record-action record-delete" (click)="onDelete(lote.id)" [disabled]="deletingId !== null" [attr.aria-label]="'Eliminar ' + lote.codigo">
+                {{ deletingId === lote.id ? 'Eliminando…' : 'Eliminar' }}
+              </button>
           
-        </td>
+        </div></td>
       </tr>
     </tbody>
   </table>
 </div>
+<app-delete-dialog></app-delete-dialog>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -51,8 +51,20 @@ export class ProductoService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.producto.delete({
-      where: { id },
-    });
+    try {
+      return await this.prisma.$transaction(async tx => {
+        const movimientos = await tx.kardex.count({ where: { productoId: id } });
+        const diferencias = await tx.bodegaDiferencia.count({ where: { productoId: id } });
+        if (movimientos || diferencias) {
+          throw new ConflictException('Este registro tiene movimientos o conteos asociados. Desactívelo para conservar el historial.');
+        }
+        return tx.producto.delete({ where: { id } });
+      }, { isolationLevel: 'Serializable' });
+    } catch (error) {
+      if (error.code === 'P2003' || error.code === 'P2034') {
+        throw new ConflictException('No se puede eliminar: el registro está en uso. Actualice la lista o desactívelo.');
+      }
+      throw error;
+    }
   }
 }

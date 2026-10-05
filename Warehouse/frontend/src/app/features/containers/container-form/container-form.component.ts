@@ -46,7 +46,7 @@ export class ContainerFormComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al cargar container';
+        this.error = 'Error al cargar el contenedor';
         this.loading = false;
         console.error(err);
       }
@@ -68,7 +68,7 @@ export class ContainerFormComponent implements OnInit {
           this.router.navigate(['/containers']);
         },
         error: (err) => {
-          this.error = err.error?.message || 'Error al actualizar container';
+          this.error = err.error?.message || 'Error al actualizar el contenedor';
           this.loading = false;
         }
       });
@@ -78,7 +78,7 @@ export class ContainerFormComponent implements OnInit {
           this.router.navigate(['/containers']);
         },
         error: (err) => {
-          this.error = err.error?.message || 'Error al crear container';
+          this.error = err.error?.message || 'Error al crear el contenedor';
           this.loading = false;
         }
       });

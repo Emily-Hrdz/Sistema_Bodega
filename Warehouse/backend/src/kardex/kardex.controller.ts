@@ -13,7 +13,7 @@ import {
 import { KardexService } from './kardex.service';
 import { CreateKardexDto } from './dto/create-kardex.dto';
 import { UpdateKardexDto } from './dto/update-kardex.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('api/kardex')
 @UseGuards(JwtAuthGuard)

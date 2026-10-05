@@ -1,0 +1,54 @@
+:host {
+  display: grid;
+  min-height: 100vh;
+  padding: 2rem;
+  place-items: center;
+}
+
+.pending-card {
+  width: min(560px, 100%);
+  padding: 3rem;
+  border: 1px solid #dbe7f5;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(35, 75, 120, 0.12);
+  text-align: center;
+}
+
+.pending-icon {
+  color: #4a90e2;
+  font-size: 4rem;
+}
+
+.eyebrow {
+  margin: 0.75rem 0 0;
+  color: #4a90e2;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0.5rem 0 1rem;
+  color: #20344d;
+}
+
+p {
+  color: #607086;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 2rem;
+
+  a {
+    padding: 0.75rem 1.1rem;
+    border-radius: 10px;
+    background: #4a90e2;
+    color: #fff;
+    text-decoration: none;
+  }
+}

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/user.model';
+import { FEATURE_FLAGS } from '../../../core/config/feature-flags';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,14 +17,14 @@ export class SidebarComponent implements OnInit {
   isCollapsed = false;
 
   menuItems = [
-    //{ icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'warehouse', label: 'Bodegas', route: '/bodegas/list' },
-    { icon: 'inventory_2', label: 'Productos', route: '/productos/list' },
-    { icon: 'swap_horiz', label: 'Kardex', route: '/kardex/list' },
-    { icon: 'local_shipping', label: 'Containers', route: '/containers' },
-    { icon: 'sell', label: 'Lotes', route: '/lotes' },
-    { icon: 'people', label: 'Clientes', route: '/clientes' },
-    { icon: 'list_alt', label: 'Auditoría', route: '/audit-logs' },
+    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard', enabled: FEATURE_FLAGS.dashboard },
+    { icon: 'warehouse', label: 'Bodegas', route: '/bodegas/list', enabled: FEATURE_FLAGS.bodegas },
+    { icon: 'inventory_2', label: 'Productos', route: '/productos/list', enabled: FEATURE_FLAGS.productos },
+    { icon: 'swap_horiz', label: 'Kardex', route: '/kardex/list', enabled: FEATURE_FLAGS.kardex },
+    { icon: 'local_shipping', label: 'Contenedores', route: '/containers', enabled: FEATURE_FLAGS.containers },
+    { icon: 'sell', label: 'Lotes', route: '/lotes', enabled: FEATURE_FLAGS.lotes },
+    { icon: 'people', label: 'Clientes', route: '/clientes', enabled: FEATURE_FLAGS.clientes },
+    { icon: 'list_alt', label: 'Auditoría', route: '/audit-logs', enabled: FEATURE_FLAGS.auditoria },
   ];
 
   constructor(

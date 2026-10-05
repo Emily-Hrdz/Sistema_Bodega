@@ -11,16 +11,28 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a
-      *ngFor="let item of menuItems"
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      class="nav-item"
-      [title]="item.label"
-    >
-      <span class="material-icons">{{ item.icon }}</span>
-      <span class="label" *ngIf="!isCollapsed">{{ item.label }}</span>
-    </a>
+    <ng-container *ngFor="let item of menuItems">
+      <a
+        *ngIf="item.enabled"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="item.label"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+        <span class="label" *ngIf="!isCollapsed">{{ item.label }}</span>
+      </a>
+
+      <div
+        *ngIf="!item.enabled"
+        class="nav-item pending"
+        [title]="item.label + ' - En desarrollo'"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+        <span class="label" *ngIf="!isCollapsed">{{ item.label }}</span>
+        <span class="status" *ngIf="!isCollapsed">En desarrollo</span>
+      </div>
+    </ng-container>
   </nav>
 
   <div class="sidebar-footer">

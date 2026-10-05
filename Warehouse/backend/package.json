@@ -10,6 +10,8 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
+    "start:render": "node scripts/start-render.cjs",
+    "test:deployment": "jest --runInBand --testPathPattern=deployment.spec.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

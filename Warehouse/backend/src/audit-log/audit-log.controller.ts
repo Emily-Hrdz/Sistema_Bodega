@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Query,
+  Param,
+  DefaultValuePipe,
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
@@ -14,16 +16,16 @@ export class AuditLogController {
   constructor(private readonly auditLogService: AuditLogService) {}
 
   @Get()
-  findAll(@Query('limit', ParseIntPipe) limit?: number) {
-    return this.auditLogService.findAll(limit);
+  findAll(@Query('limit', new DefaultValuePipe(100), ParseIntPipe) limit: number) {
+    return this.auditLogService.findAll(Math.max(1, Math.min(limit, 200)));
   }
 
   @Get('user/:userId')
   findByUser(
-    @Query('userId', ParseIntPipe) userId: number,
-    @Query('limit', ParseIntPipe) limit?: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
-    return this.auditLogService.findByUser(userId, limit);
+    return this.auditLogService.findByUser(userId, Math.max(1, Math.min(limit, 200)));
   }
 
   @Get('entity')

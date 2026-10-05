@@ -15,11 +15,11 @@
     <div class="filters-grid">
       <div class="filter-group">
         <label>Fecha Inicio</label>
-        <input type="date" [(ngModel)]="fechaInicio" (change)="applyFilters()">
+        <input type="date" [ngModel]="fechaInicio" (ngModelChange)="fechaInicio = $event; applyFilters()">
       </div>
       <div class="filter-group">
         <label>Fecha Fin</label>
-        <input type="date" [(ngModel)]="fechaFin" (change)="applyFilters()">
+        <input type="date" [ngModel]="fechaFin" (ngModelChange)="fechaFin = $event; applyFilters()">
       </div>
      
       <div class="filter-group">
@@ -39,6 +39,8 @@
     <div class="filter-actions">
       <button class="btn btn-sm btn-secondary" (click)="clearFilters()">Limpiar Filtros</button>
     </div>
+    <p>El rango incluye ambos días completos. Para consultar un solo día, selecciona la misma fecha en Inicio y Fin.</p>
+    <div *ngIf="dateFilterError" class="alert alert-error" role="alert">{{ dateFilterError }}</div>
   </div>
 
   <!-- Resumen -->
@@ -66,11 +68,6 @@
     <div class="chart-header">
       <h2>Dashboard de Inventario</h2>
       <div class="chart-controls">
-        <select [(ngModel)]="chartTimeRange" (change)="renderCharts()">
-          <option value="day">Por Día</option>
-          <option value="week">Por Semana</option>
-          <option value="month">Por Mes</option>
-        </select>
         <button class="btn btn-sm" 
                 [class.btn-primary]="chartType === 'line'"
                 (click)="changeChartType('line')">Línea</button>
@@ -150,7 +147,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let mov of displayedMovimientos">
-            <td>{{ mov.fecha | date:'MM/dd/yy' }}</td>
+            <td>{{ mov.fecha | date:'dd/MM/yyyy' }}</td>
             <td>{{ mov.bodega?.nombre }}</td>
             <td>{{ mov.producto?.nombre }}</td>
             <td>

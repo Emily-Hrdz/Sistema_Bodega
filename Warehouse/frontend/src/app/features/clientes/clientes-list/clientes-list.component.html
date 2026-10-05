@@ -14,15 +14,15 @@
     No hay clientes registrados
   </div>
 
-  <table *ngIf="!loading && clientes.length > 0" class="table">
+  <table *ngIf="!loading && clientes.length > 0" class="table catalog-table">
     <thead>
       <tr>
         <th>Código</th>
         <th>Nombre</th>
         <th>Email</th>
         <th>Teléfono</th>
-        <th>Estado</th>
-        <th>Acciones</th>
+        <th class="status-cell">Estado</th>
+        <th class="actions-cell">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -31,19 +31,19 @@
         <td>{{ cliente.nombre }}</td>
         <td>{{ cliente.email || '-' }}</td>
         <td>{{ cliente.telefono || '-' }}</td>
-        <td>
-          <span [class]="cliente.activo ? 'badge-success' : 'badge-danger'">
+        <td class="status-cell"><span class="record-status" [class.is-active]="cliente.activo" [class.is-inactive]="!cliente.activo">
             {{ cliente.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-        <td class="actions">
-         
-          <button class="btn btn-sm btn-warning" (click)="onEdit(cliente.id)">
+          </span></td>
+        <td class="actions-cell"><div class="record-actions"><button class="record-action record-edit" (click)="onEdit(cliente.id)">
             Editar
           </button>
+              <button type="button" class="record-action record-delete" (click)="onDelete(cliente.id)" [disabled]="deletingId !== null" [attr.aria-label]="'Eliminar ' + cliente.codigo">
+                {{ deletingId === cliente.id ? 'Eliminando…' : 'Eliminar' }}
+              </button>
         
-        </td>
+        </div></td>
       </tr>
     </tbody>
   </table>
 </div>
+<app-delete-dialog></app-delete-dialog>

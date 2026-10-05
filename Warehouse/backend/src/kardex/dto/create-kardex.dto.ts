@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsNumber, IsString, IsDateString } from 'class-validator';
+import { IsInt, IsOptional, IsNumber, IsString, IsDateString, IsPositive } from 'class-validator';
 
 export class CreateKardexDto {
   @IsInt()
@@ -27,6 +27,7 @@ export class CreateKardexDto {
   fecha?: string;
 
   @IsNumber()
+  @IsPositive()
   cantidad: number;
 
   @IsString()

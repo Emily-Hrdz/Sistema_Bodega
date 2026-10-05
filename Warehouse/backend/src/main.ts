@@ -10,6 +10,7 @@ async function bootstrap() {
   'http://localhost:4200', // desarrollo
   'https://sistema-bodega.onrender.com', // backend en Render
   'https://emily-hrdz.github.io', // frontend GitHub Pages
+  ...(process.env.CORS_ORIGINS || '').split(',').map(origin => origin.trim()).filter(Boolean),
 ];
 
 
@@ -35,7 +36,7 @@ async function bootstrap() {
 
   // Puerto dinámico asignado por Render
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`🚀 Backend corriendo en puerto ${port}`);
 }
 bootstrap();

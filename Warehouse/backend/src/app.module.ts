@@ -15,6 +15,7 @@ import { TipoMovimientoModule } from './tipo-movimiento/tipo-movimiento.module';
 import { KardexModule } from './kardex/kardex.module';
 import { BodegaDiferenciaModule } from './bodega-diferencia/bodega-diferencia.module';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
     KardexModule,
     BodegaDiferenciaModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_INTERCEPTOR,
