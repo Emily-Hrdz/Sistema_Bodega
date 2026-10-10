@@ -12,12 +12,13 @@ operativo real. No exportar la base local ni publicar usuarios/contraseñas.
 - Health check: `/api/health`.
 - Variables privadas en Render: `DATABASE_URL` (cadena completa de Neon con SSL),
   `JWT_SECRET` (aleatorio, mínimo 32 caracteres), `JWT_EXPIRES_IN=7d`.
-- Opcional: `SEED_DEMO=true` para crear catálogos y movimientos ficticios.
+- Los catálogos ficticios se completan automáticamente al iniciar; no se crean
+  movimientos nuevos en Kardex ni cuentas de usuario.
 - Opcional: `CORS_ORIGINS` con orígenes adicionales separados por comas.
 
 El comando start:render comprueba que el destino sea Neon y que Render esté
-presente, aplica las migraciones versionadas, carga ejemplos si SEED_DEMO está
-activado y arranca la API en PORT. No carga el .env local. Para migraciones utiliza
+presente, aplica las migraciones versionadas, completa los catálogos de ejemplo
+y arranca la API en PORT. No carga el .env local. Para migraciones utiliza
 el endpoint directo equivalente de Neon; la aplicación conserva la URL agrupada.
 Ante un error de migración no arranca. No usa migrate reset ni db push.
 
@@ -25,8 +26,9 @@ La carga de ejemplos usa nombres y códigos habituales (por ejemplo, `PROD-001`)
 no crea cuentas ni contraseñas y no sobrescribe los datos de catálogos
 existentes. En cada arranque se renombran una sola vez los registros de la
 versión anterior que llevaban etiquetas DEMO, conservando sus ID y movimientos.
-Puede volver a crear un catálogo eliminado al reiniciar mientras `SEED_DEMO`
-esté activo. Desactivar `SEED_DEMO` después de la primera carga.
+El proceso no crea nuevos movimientos en Kardex ni cambia saldos. Como los
+catálogos se completan en cada arranque, un registro de muestra eliminado puede
+volver a aparecer tras un reinicio. `SEED_DEMO` ya no es necesario.
 
 Comprobar `/api/health` después del despliegue. En el plan gratuito puede haber
 espera al reactivarse tras inactividad; abrir la demo antes de la presentación.

@@ -45,11 +45,12 @@ describe('Carga ficticia sin conexión a base real', () => {
     expect(records.bodega).toEqual([{ id: 4, nombre: 'Bodega 1 Amatitlán', ubicacion: 'Amatitlán, Guatemala' }]);
     expect(movements).toEqual([{ bodegaId: 4, observaciones: 'Recepción de mercancía' }]);
   });
-  it('crea ejemplos y no duplica movimientos ni sobrescribe catálogos al repetir', async () => {
-    const movements: any[] = [];
+  it('amplía catálogos sin crear movimientos y no duplica registros al repetir', async () => {
+    const catalogs: any = {};
     const tx: any = {};
     for (const name of ['bodega', 'tipoProducto', 'container', 'lote', 'cliente', 'tipoMovimiento', 'producto']) {
       const records = new Map();
+      catalogs[name] = records;
       tx[name] = { upsert: jest.fn(async ({ where, create, update }) => {
         expect(update).toEqual({});
         const key = JSON.stringify(where);
@@ -57,16 +58,17 @@ describe('Carga ficticia sin conexión a base real', () => {
         return records.get(key);
       }) };
     }
-    tx.kardex = {
-      count: async ({ where }) => movements.filter(m => m.bodegaId === where.bodegaId && m.productoId === where.productoId).length,
-      create: async ({ data }) => { movements.push(data); return data; },
-    };
+    tx.kardex = { create: jest.fn(), update: jest.fn(), delete: jest.fn() };
     const db = { $transaction: async callback => callback(tx) };
     await seedCloudDemo(db);
-    expect(movements).toHaveLength(10);
-    expect(movements.every(m => m.saldoNuevo >= 0)).toBe(true);
+    expect(Object.fromEntries(Object.entries(catalogs).map(([name, records]: [string, any]) => [name, records.size]))).toEqual({
+      bodega: 5, tipoProducto: 5, container: 6, lote: 6, cliente: 6, tipoMovimiento: 4, producto: 16,
+    });
     await seedCloudDemo(db);
-    expect(movements).toHaveLength(10);
+    expect(catalogs.producto.size).toBe(16);
+    expect(tx.kardex.create).not.toHaveBeenCalled();
+    expect(tx.kardex.update).not.toHaveBeenCalled();
+    expect(tx.kardex.delete).not.toHaveBeenCalled();
   });
 });
 

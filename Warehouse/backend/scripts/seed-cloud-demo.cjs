@@ -11,6 +11,19 @@ const products = [
   ['PROD-006', 'Azúcar blanca 1 kg'],
 ];
 
+const additionalProducts = [
+  ['PROD-007', 'Lenteja 1 kg', 'Granos y cereales', 'Bolsa', true],
+  ['PROD-008', 'Pasta tipo espagueti 400 g', 'Granos y cereales', 'Paquete', true],
+  ['PROD-009', 'Maíz dulce en lata 300 g', 'Conservas', 'Lata', true],
+  ['PROD-010', 'Sardinas en salsa de tomate 155 g', 'Conservas', 'Lata', true],
+  ['PROD-011', 'Jugo de naranja 1 litro', 'Bebidas', 'Caja', true],
+  ['PROD-012', 'Café molido 250 g', 'Bebidas', 'Bolsa', true],
+  ['PROD-013', 'Leche entera UHT 1 litro', 'Lácteos', 'Caja', true],
+  ['PROD-014', 'Leche en polvo 400 g', 'Lácteos', 'Lata', true],
+  ['PROD-015', 'Galletas integrales 200 g', 'Granos y cereales', 'Paquete', false],
+  ['PROD-016', 'Duraznos en almíbar 820 g', 'Conservas', 'Lata', false],
+];
+
 // Update only records created by the previous cloud seed. Keep their IDs so
 // existing Kardex movements and relationships remain intact.
 async function normalizeCloudSeed(db) {
@@ -46,28 +59,50 @@ async function normalizeCloudSeed(db) {
 
 async function seedCloudDemo(db) {
   return db.$transaction(async tx => {
-    const warehouse = await tx.bodega.upsert({ where: { nombre: 'Bodega 1 Amatitlán' }, update: {}, create: { nombre: 'Bodega 1 Amatitlán', ubicacion: 'Amatitlán, Guatemala' } });
+    await tx.bodega.upsert({ where: { nombre: 'Bodega 1 Amatitlán' }, update: {}, create: { nombre: 'Bodega 1 Amatitlán', ubicacion: 'Amatitlán, Guatemala' } });
     await tx.bodega.upsert({ where: { nombre: 'Bodega 2 Villa Nueva' }, update: {}, create: { nombre: 'Bodega 2 Villa Nueva', ubicacion: 'Villa Nueva, Guatemala', activo: false } });
+    for (const [nombre, ubicacion, activo] of [
+      ['Bodega 3 Quetzaltenango', 'Quetzaltenango, Guatemala', true],
+      ['Bodega 4 Escuintla', 'Escuintla, Guatemala', true],
+      ['Bodega 5 Antigua Guatemala', 'Antigua Guatemala, Sacatepéquez', false],
+    ]) await tx.bodega.upsert({ where: { nombre }, update: {}, create: { nombre, ubicacion, activo } });
     const category = await tx.tipoProducto.upsert({ where: { nombre: 'Alimentos y abarrotes' }, update: {}, create: { nombre: 'Alimentos y abarrotes' } });
-    const container = await tx.container.upsert({ where: { codigo: 'CONT-001' }, update: {}, create: { codigo: 'CONT-001', descripcion: 'Estante A1' } });
+    const categories = { [category.nombre]: category };
+    for (const nombre of ['Granos y cereales', 'Conservas', 'Bebidas', 'Lácteos']) {
+      categories[nombre] = await tx.tipoProducto.upsert({ where: { nombre }, update: {}, create: { nombre } });
+    }
+    await tx.container.upsert({ where: { codigo: 'CONT-001' }, update: {}, create: { codigo: 'CONT-001', descripcion: 'Estante A1' } });
     await tx.container.upsert({ where: { codigo: 'CONT-002' }, update: {}, create: { codigo: 'CONT-002', descripcion: 'Contenedor de reserva', activo: false } });
-    const lote = await tx.lote.upsert({ where: { codigo: 'LOTE-001' }, update: {}, create: { codigo: 'LOTE-001', fechaVencimiento: new Date('2028-12-31T12:00:00Z') } });
+    for (const [codigo, descripcion, activo] of [
+      ['CONT-003', 'Estante A2', true], ['CONT-004', 'Tarima B1', true],
+      ['CONT-005', 'Estante de bebidas', true], ['CONT-006', 'Tarima de reserva', false],
+    ]) await tx.container.upsert({ where: { codigo }, update: {}, create: { codigo, descripcion, activo } });
+    await tx.lote.upsert({ where: { codigo: 'LOTE-001' }, update: {}, create: { codigo: 'LOTE-001', fechaVencimiento: new Date('2028-12-31T12:00:00Z') } });
     await tx.lote.upsert({ where: { codigo: 'LOTE-002' }, update: {}, create: { codigo: 'LOTE-002', activo: false } });
-    const client = await tx.cliente.upsert({ where: { codigo: 'CLI-001' }, update: {}, create: { codigo: 'CLI-001', nombre: 'Comercial El Lago', telefono: '12345678' } });
+    for (const [codigo, fechaVencimiento, activo] of [
+      ['LOTE-003', '2028-06-30T12:00:00Z', true], ['LOTE-004', '2029-03-31T12:00:00Z', true],
+      ['LOTE-005', '2029-09-30T12:00:00Z', true], ['LOTE-006', null, false],
+    ]) await tx.lote.upsert({ where: { codigo }, update: {}, create: { codigo, fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : null, activo } });
+    await tx.cliente.upsert({ where: { codigo: 'CLI-001' }, update: {}, create: { codigo: 'CLI-001', nombre: 'Comercial El Lago', telefono: '12345678' } });
     await tx.cliente.upsert({ where: { codigo: 'CLI-002' }, update: {}, create: { codigo: 'CLI-002', nombre: 'Abarrotería Central', telefono: '12345678', activo: false } });
-    const types = {};
+    for (const [codigo, nombre, activo] of [
+      ['CLI-003', 'Tienda Las Flores', true], ['CLI-004', 'Distribuidora Los Pinos', true],
+      ['CLI-005', 'Mercado La Esperanza', true], ['CLI-006', 'Comercial Santa Clara', false],
+    ]) await tx.cliente.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, telefono: '12345678', activo } });
     for (const [tipo, codigo, nombre] of [['ENTRADA', 'ENT-001', 'Recepción de mercancía'], ['SALIDA', 'SAL-001', 'Despacho a cliente']]) {
-      types[tipo] = await tx.tipoMovimiento.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipo } });
+      await tx.tipoMovimiento.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipo } });
     }
+    for (const [codigo, nombre, tipo] of [
+      ['ENT-002', 'Devolución de cliente', 'ENTRADA'],
+      ['SAL-002', 'Merma de producto', 'SALIDA'],
+    ]) await tx.tipoMovimiento.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipo } });
     for (const [index, [codigo, nombre]] of products.entries()) {
-      const product = await tx.producto.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipoProductoId: category.id, unidadMedida: 'Unidad', activo: index < 5 } });
-      // Do not reset balances or recreate history for an already-used product.
-      if (index >= 5 || await tx.kardex.count({ where: { bodegaId: warehouse.id, productoId: product.id } })) continue;
-      const quantity = 100 + index * 20;
-      const date = new Date(Date.now() - (5 - index) * 86400000);
-      await tx.kardex.create({ data: { bodegaId: warehouse.id, productoId: product.id, containerId: container.id, loteId: lote.id, tipoMovimientoId: types.ENTRADA.id, fecha: date, cantidad: quantity, saldoAnterior: 0, saldoNuevo: quantity, observaciones: 'Recepción de mercancía' } });
-      await tx.kardex.create({ data: { bodegaId: warehouse.id, productoId: product.id, clienteId: client.id, tipoMovimientoId: types.SALIDA.id, fecha: new Date(date.getTime() + 3600000), cantidad: 20, saldoAnterior: quantity, saldoNuevo: quantity - 20, observaciones: 'Despacho a cliente' } });
+      await tx.producto.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipoProductoId: category.id, unidadMedida: 'Unidad', activo: index < 5 } });
     }
+    for (const [codigo, nombre, tipoProducto, unidadMedida, activo] of additionalProducts) {
+      await tx.producto.upsert({ where: { codigo }, update: {}, create: { codigo, nombre, tipoProductoId: categories[tipoProducto].id, unidadMedida, activo } });
+    }
+    // Catalog additions never create, delete or adjust Kardex movements or balances.
   }, { isolationLevel: 'Serializable', timeout: 30000 });
 }
 async function main() {
@@ -75,8 +110,8 @@ async function main() {
   const db = new PrismaClient();
   try {
     await normalizeCloudSeed(db);
-    if (process.env.SEED_DEMO === 'true') await seedCloudDemo(db);
-    console.log('Nombres y códigos de presentación actualizados.');
+    await seedCloudDemo(db);
+    console.log('Catálogos de presentación actualizados sin modificar Kardex.');
   }
   finally { await db.$disconnect(); }
 }
