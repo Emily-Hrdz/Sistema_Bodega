@@ -21,9 +21,12 @@ activado y arranca la API en PORT. No carga el .env local. Para migraciones util
 el endpoint directo equivalente de Neon; la aplicación conserva la URL agrupada.
 Ante un error de migración no arranca. No usa migrate reset ni db push.
 
-La carga de ejemplos usa códigos DEMO, no crea cuentas ni contraseñas y no
-sobrescribe los datos de catálogos existentes. Puede volver a crear un catálogo
-demo eliminado al reiniciar. Desactivar SEED_DEMO después de la primera carga.
+La carga de ejemplos usa nombres y códigos habituales (por ejemplo, `PROD-001`),
+no crea cuentas ni contraseñas y no sobrescribe los datos de catálogos
+existentes. En cada arranque se renombran una sola vez los registros de la
+versión anterior que llevaban etiquetas DEMO, conservando sus ID y movimientos.
+Puede volver a crear un catálogo eliminado al reiniciar mientras `SEED_DEMO`
+esté activo. Desactivar `SEED_DEMO` después de la primera carga.
 
 Comprobar `/api/health` después del despliegue. En el plan gratuito puede haber
 espera al reactivarse tras inactividad; abrir la demo antes de la presentación.

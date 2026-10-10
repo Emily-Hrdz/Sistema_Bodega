@@ -22,9 +22,29 @@ import { HealthController } from './health.controller';
 
 const secret = 'test-only-secret-not-for-deployment-0000';
 const { configuration } = require('../scripts/start-render.cjs');
-const { seedCloudDemo } = require('../scripts/seed-cloud-demo.cjs');
+const { normalizeCloudSeed, seedCloudDemo } = require('../scripts/seed-cloud-demo.cjs');
 
 describe('Carga ficticia sin conexión a base real', () => {
+  it('renombra registros anteriores sin cambiar IDs ni movimientos relacionados', async () => {
+    const records: any = {
+      bodega: [{ id: 4, nombre: 'Bodega demo Amatitlan', ubicacion: 'Amatitlan, Guatemala (demostración)' }],
+      tipoProducto: [], container: [], lote: [], cliente: [], tipoMovimiento: [], producto: [],
+    };
+    const tx: any = {};
+    for (const name of Object.keys(records)) {
+      tx[name] = {
+        findUnique: async ({ where }) => records[name].find(record => Object.entries(where).every(([key, value]) => record[key] === value)) ?? null,
+        update: async ({ where, data }) => Object.assign(records[name].find(record => record.id === where.id), data),
+      };
+    }
+    const movements = [{ bodegaId: 4, observaciones: '[DEMO-NUBE] Entrada ficticia' }];
+    tx.kardex = { updateMany: async ({ where, data }) => movements.filter(m => m.observaciones === where.observaciones).forEach(m => Object.assign(m, data)) };
+    const db = { $transaction: async callback => callback(tx) };
+    await normalizeCloudSeed(db);
+    await normalizeCloudSeed(db);
+    expect(records.bodega).toEqual([{ id: 4, nombre: 'Bodega 1 Amatitlán', ubicacion: 'Amatitlán, Guatemala' }]);
+    expect(movements).toEqual([{ bodegaId: 4, observaciones: 'Recepción de mercancía' }]);
+  });
   it('crea ejemplos y no duplica movimientos ni sobrescribe catálogos al repetir', async () => {
     const movements: any[] = [];
     const tx: any = {};

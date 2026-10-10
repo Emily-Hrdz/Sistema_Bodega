@@ -23,10 +23,8 @@ async function main() {
     cwd: resolve(__dirname, '..'), env: { ...env, DATABASE_URL: env.DIRECT_DATABASE_URL }, stdio: 'inherit',
   });
   if (migration.error || migration.status !== 0) throw new Error('No se pudo aplicar las migraciones; el servidor no se iniciará.');
-  if (env.SEED_DEMO === 'true') {
-    const seed = spawnSync(process.execPath, [resolve(__dirname, 'seed-cloud-demo.cjs')], { env, stdio: 'inherit' });
-    if (seed.error || seed.status !== 0) throw new Error('No se pudo preparar los datos de demostración.');
-  }
+  const seed = spawnSync(process.execPath, [resolve(__dirname, 'seed-cloud-demo.cjs')], { env, stdio: 'inherit' });
+  if (seed.error || seed.status !== 0) throw new Error('No se pudieron actualizar los datos de presentación.');
   const server = spawn(process.execPath, [resolve(__dirname, '../dist/main.js')], { env, stdio: 'inherit' });
   for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => server.kill(signal));
   server.on('error', () => { process.exitCode = 1; });
